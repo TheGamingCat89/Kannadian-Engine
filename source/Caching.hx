@@ -1,3 +1,6 @@
+package;
+
+import openfl.Lib;
 #if sys
 import flixel.graphics.FlxGraphic;
 #if cpp
@@ -29,6 +32,8 @@ class Caching extends MusicBeatState
 
 	    FlxG.mouse.visible = false;
 		FlxG.worldBounds.set(0,0);
+		FlxG.game.focusLostFramerate = 60;
+		FlxG.autoPause = false;
 
 		logo = new FlxSprite(FlxG.width / 2, FlxG.height / 2).loadGraphic(Paths.image('preloaderArt'));
 		logo.setGraphicSize(Std.int(logo.width * 0.3));		
@@ -40,7 +45,7 @@ class Caching extends MusicBeatState
 			preload();
 		});
 		#else
-		FlxG.switchState(new TitleState());
+		LoadingState.loadAndSwitchState(new TitleState());
 		#end
 	}
 

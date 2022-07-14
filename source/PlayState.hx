@@ -848,6 +848,8 @@ class PlayState extends MusicBeatState
 		FlxG.stage.addEventListener(KeyboardEvent.KEY_DOWN, press);
 		FlxG.stage.addEventListener(KeyboardEvent.KEY_UP, release);
 
+		FlxG.bitmap.clearUnused();
+
 		super.create();
 	}
 
@@ -1338,6 +1340,23 @@ class PlayState extends MusicBeatState
 	
 	override public function onFocusLost():Void
 	{
+		if (!paused)
+		{
+			persistentUpdate = false;
+			persistentDraw = true;
+			paused = true;
+
+			// 1 / 1000 chance for Gitaroo Man easter egg
+			if (FlxG.random.bool(0.1))
+				FlxG.switchState(new GitarooPause());
+			else
+				openSubState(new PauseSubState(boyfriend.getScreenPosition().x, boyfriend.getScreenPosition().y));
+		}
+			
+		#if desktop
+		DiscordClient.changePresence(detailsPausedText, SONG.song + " (" + storyDifficultyText + ")", iconRPC);
+		#end
+
 		#if desktop
 		if (health > 0 && !paused)
 		{
@@ -2146,7 +2165,7 @@ class PlayState extends MusicBeatState
 
 		//animation shit yeah
 		if (boyfriend.holdTimer > Conductor.stepCrochet * 0.004 && pressed.contains(false) &&
-			boyfriend.animation.curAnim.name.startsWith('sing') && !boyfriend.animation.curAnim.name.endsWith('miss'))
+			!boyfriend.animation.curAnim.name.startsWith('sing') && !boyfriend.animation.curAnim.name.endsWith('miss'))
 				boyfriend.playAnim('idle');
 
 		playerStrums.forEach(function(spr:FlxSprite)
@@ -2409,10 +2428,10 @@ class PlayState extends MusicBeatState
 			camHUD.zoom += 0.03;
 		}
 
-		iconP1.scale.set(1.24);
-		iconP2.scale.set(1.24);
-		FlxTween.tween(iconP1.scale, {x: 1, y: 1}, 1, {ease: FlxEase.sineOut});
-		FlxTween.tween(iconP2.scale, {x: 1, y: 1}, 1, {ease: FlxEase.sineOut});
+		iconP1.scale.set(1.24, 1.24);
+		iconP2.scale.set(1.24, 1.24);
+		FlxTween.tween(iconP1.scale, {x: 1, y: 1}, 0.1, {ease: FlxEase.sineOut});
+		FlxTween.tween(iconP2.scale, {x: 1, y: 1}, 0.1, {ease: FlxEase.sineOut});
 		
 		if (curBeat % gfSpeed == 0)
 		{

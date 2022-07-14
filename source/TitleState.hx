@@ -1,5 +1,9 @@
 package;
 
+import openfl.media.SoundLoaderContext;
+import flixel.addons.display.shapes.FlxShapeDonut;
+import flixel.system.FlxSoundGroup;
+import openfl.media.SoundTransform;
 #if desktop
 import Discord.DiscordClient;
 import sys.thread.Thread;
@@ -80,7 +84,6 @@ class TitleState extends MusicBeatState
 		
 		Application.current.onExit.add(exitCode -> {
 			DiscordClient.shutdown();
-			FlxG.bitmap.clearCache();
 		 });
 		#end
 	}
@@ -184,8 +187,6 @@ class TitleState extends MusicBeatState
 		ngSpr.updateHitbox();
 		ngSpr.screenCenter(X);
 		ngSpr.antialiasing = true;
-
-		FlxTween.tween(credTextShit, {y: credTextShit.y + 20}, 2.9, {ease: FlxEase.quadInOut, type: PINGPONG});
 
 		FlxG.mouse.visible = false;
 
