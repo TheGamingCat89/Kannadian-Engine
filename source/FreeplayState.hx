@@ -524,15 +524,13 @@ class FreeplayState extends MusicBeatState
 		icon.scale.set(icon.scale.x + zoomShit * 6, icon.scale.y + zoomShit * 6);
 		FlxTween.tween(grpIcons.members[(isWeek ? curWeekSelected :curSongSelected)].scale, {x: 1, y: 1}, 0.1);
 
-		if (!OptionsMenu.options.cameraZoom) //not zoom but anyway
+		if (OptionsMenu.options.cameraZoom) //not zoom but anyway
 		{
 			bg.scale.x += zoomShit;
 			bg.scale.y += zoomShit;	
 			FlxTween.tween(bg.scale, {x: 1, y: 1}, 0.1);
 			FlxG.camera.shake(0.0025, 0.1);
-		}
-
-		
+		}	
 	}
 }
 

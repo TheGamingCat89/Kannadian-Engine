@@ -24,6 +24,7 @@ class Note extends FlxSprite
 	public var sustainLength:Float = 0;
 	public var isSustainNote:Bool = false;
 	public var isChord:Bool = false;
+	public var parentHold:Bool = false;
 
 	public var noteScore:Float = 1;
 
@@ -100,7 +101,7 @@ class Note extends FlxSprite
 
 				setGraphicSize(Std.int(width * 0.7));
 				updateHitbox();
-				antialiasing = true;
+				antialiasing = OptionsMenu.options.antialiasing;
 		}
 
 		switch (noteData)
@@ -123,6 +124,7 @@ class Note extends FlxSprite
 
 		if (isSustainNote && prevNote != null)
 		{
+			prevNote.parentHold = true;
 			if (OptionsMenu.options.downScroll)
 				flipY = true;
 			

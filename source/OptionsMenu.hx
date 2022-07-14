@@ -226,7 +226,7 @@ class OptionsMenu extends MusicBeatState
 
 	override function beatHit()
 	{		
-		if (!OptionsMenu.options.cameraZoom)
+		if (OptionsMenu.options.cameraZoom)
 		{
 			camera.shake(0.001, 0.05);
 			bg.scale.set(1.02, 1.02);
