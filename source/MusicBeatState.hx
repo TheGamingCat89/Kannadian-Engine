@@ -64,8 +64,10 @@ class MusicBeatState extends FlxUIState
 
 	public function stepHit():Void
 	{
-		if (curStep % 4 == 0)
-			beatHit();
+		try{
+			if (curStep % 4 == 0)
+				beatHit();
+		}catch(e){}
 	}
 
 	public function beatHit():Void

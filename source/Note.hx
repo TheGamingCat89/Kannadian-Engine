@@ -120,13 +120,13 @@ class Note extends FlxSprite
 				animation.play('redScroll');
 		}
 
+		flipY = OptionsMenu.options.downScroll && sustainNote;
+
 		// trace(prevNote);
 
 		if (isSustainNote && prevNote != null)
 		{
 			prevNote.parentHold = true;
-			if (OptionsMenu.options.downScroll)
-				flipY = true;
 			
 			noteScore *= 0.2;//probably what they intended
 			alpha = 0.6;
@@ -176,9 +176,6 @@ class Note extends FlxSprite
 	override function update(elapsed:Float)
 	{
 		super.update(elapsed);
-
-		if (prevNote != null)
-			isChord = strumTime == prevNote.strumTime && noteData != prevNote.noteData; //might not be the best way but it might work???
 
 		if (mustPress)
 		{

@@ -1,6 +1,5 @@
 package;
 
-import openfl.Lib;
 #if sys
 import flixel.graphics.FlxGraphic;
 #if cpp
@@ -51,6 +50,8 @@ class Caching extends MusicBeatState
 
 	public function preload()
 	{
+		trace("caching shit");
+
         var blacklist = ['lol.png', 'backspace.png', 'grafix.png', 'lose.png', 'screencapTierImage.png', 'week54prototype.png', 'zzzzzzzz.png', 'logo.png', 'preloaderArt.png'];
 		FlxGraphic.defaultPersist = true;
 
@@ -61,6 +62,28 @@ class Caching extends MusicBeatState
         for(file in FileSystem.readDirectory(FileSystem.absolutePath("assets/images")))
             if (file.endsWith(".png") && !blacklist.contains(file))
                 FlxG.bitmap.add(Paths.image(file.split(".")[0]));
+
+		//I HOPE IT WORKS :SOB:
+		for (i in 1...6) //each folder
+			for (HII in FileSystem.readDirectory(FileSystem.absolutePath("assets/week" + i))) //HII = images folder
+				try { 
+					for (fuck in FileSystem.readDirectory(FileSystem.absolutePath(HII)))//IMAGE OR FOLDER INSIDE OF IMAGES FOLDER
+					{
+						trace(fuck);
+						if (fuck.endsWith(".png"))
+							FlxG.bitmap.add(Paths.image(fuck.split(".")[0]))
+						else {
+							try {
+								for(file in FileSystem.readDirectory(FileSystem.absolutePath(fuck)))
+								{	
+									trace(file);
+									if (file.endsWith(".png"))
+										FlxG.bitmap.add(Paths.image(file.split(".")[0]));
+								}
+							} catch (e) { trace(e); }
+						}
+					}
+				} catch(e) {trace(e); }
 
 		LoadingState.loadAndSwitchState(new TitleState());
 	}

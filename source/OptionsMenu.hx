@@ -114,6 +114,7 @@ class OptionsMenu extends MusicBeatState
 					optionsLength++;
 				}
 				isInOptionCat = true;
+				changeSelection();
 			}
 			else
 			{
@@ -185,6 +186,7 @@ class OptionsMenu extends MusicBeatState
 					optionsLength++;
 				}
 				isInOptionCat = false; //i almost forgot about this shit :skull:
+				changeSelection();
 			}
 			else
 				FlxG.switchState(new MainMenuState());

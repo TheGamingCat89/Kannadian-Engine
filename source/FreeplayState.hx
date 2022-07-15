@@ -99,7 +99,6 @@ class FreeplayState extends MusicBeatState
 				var diffs = [];
 				var diffsThatExist = [];
 				
-				
 				#if sys
 				if (FileSystem.exists('assets/data/${meta.songName}/${meta.songName}-hard.json'))
 					diffsThatExist.push("Hard");
@@ -289,6 +288,9 @@ class FreeplayState extends MusicBeatState
 
 		if (controls.BACK)
 		{
+			if (colorTween != null)
+				colorTween.cancel();
+
 			if(!isWeek)
 			{			
 				isWeek = true;
@@ -314,10 +316,10 @@ class FreeplayState extends MusicBeatState
 
 		if (accepted)
 		{
+			if (colorTween != null)
+				colorTween.cancel();
 			if (isWeek)
 			{
-				if (colorTween != null)
-					colorTween.cancel();
 				//this should work?
 				isWeek = false;
 				grpSongs.clear();
@@ -332,7 +334,6 @@ class FreeplayState extends MusicBeatState
 					var icon:HealthIcon = new HealthIcon(song.songCharacter);
 					icon.sprTracker = songLabel;
 					grpIcons.add(icon);
-					//add(icon);
 				}
 				curSongSelected = 0;
 				changeSelection();
@@ -419,9 +420,6 @@ class FreeplayState extends MusicBeatState
 
 	function changeSelection(change:Int = 0)
 	{
-		if (colorTween != null)
-			colorTween.cancel();
-
 		FlxG.sound.play(Paths.sound('scrollMenu'), 0.4);
 
 		(isWeek ? curWeekSelected += change : curSongSelected += change);
@@ -492,16 +490,16 @@ class FreeplayState extends MusicBeatState
 					iconColor = colorData[1];
 			}
 
-			if (colorTween == null)
+			if (bg.color != FlxColor.fromString("#FF" + iconColor))
 			{
-				if (bg.color != FlxColor.fromString("#FF" + iconColor))
-				{
-					colorTween = FlxTween.color(bg, 1, bg.color, FlxColor.fromString("#FF" + iconColor), {ease: FlxEase.sineInOut,
-						onComplete: twn -> {
-							colorTween = null;
-						} 
-					});
-				}		
+				if (colorTween != null)
+					colorTween.cancel();
+
+				colorTween = FlxTween.color(bg, 1, bg.color, FlxColor.fromString("#FF" + iconColor), {ease: FlxEase.sineInOut,
+					onComplete: twn -> {
+						colorTween = null;
+					} 
+				});
 			}
 			
 		}
