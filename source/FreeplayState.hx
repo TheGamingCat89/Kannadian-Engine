@@ -378,6 +378,9 @@ class FreeplayState extends MusicBeatState
 				instPlaying = weeks[curWeekSelected].songs[curSongSelected].songName.toLowerCase();
 	
 				text.text = 'Playing ' + weeks[curWeekSelected].songs[curSongSelected].songName + '!';
+				#if windows
+				DiscordClient.changePresence("In the Freeplay Menu", "Listening to " + weeks[curWeekSelected].songs[curSongSelected].songName);
+				#end
 				new FlxTimer().start(1, function(tmr:FlxTimer)
 				{
 					text.text = "Press SPACE to listen to this song";

@@ -1,6 +1,8 @@
 package;
 
+
 #if sys
+import Discord.DiscordClient;
 import flixel.graphics.FlxGraphic;
 #if cpp
 import sys.FileSystem;
@@ -15,7 +17,7 @@ using StringTools;
 class Caching extends MusicBeatState
 {
 	var logo:FlxSprite;
-
+	
 	override function create() 
 	{
 		FlxG.save.bind('funkin', 'ninjamuffin99');
@@ -33,6 +35,8 @@ class Caching extends MusicBeatState
 		FlxG.worldBounds.set(0,0);
 		FlxG.game.focusLostFramerate = 60;
 		FlxG.autoPause = false;
+
+		DiscordClient.initialize();
 
 		logo = new FlxSprite(FlxG.width / 2, FlxG.height / 2).loadGraphic(Paths.image('preloaderArt'));
 		logo.setGraphicSize(Std.int(logo.width * 0.3));		
@@ -84,6 +88,10 @@ class Caching extends MusicBeatState
 						}
 					}
 				} catch(e) {trace(e); }
+
+		remove(logo);
+		logo.kill();
+		logo.destroy();
 
 		LoadingState.loadAndSwitchState(new TitleState());
 	}

@@ -3,6 +3,8 @@ package;
 //if you like art check out my friend for no reason i dont know why im putting this here LMAOO
 //https://twitter.com/karowaro/status/1546041015198314496?s=20&t=TlX-gAg9on6a3zCC4MVqEw
 
+import haxe.CallStack;
+import haxe.Http;
 import openfl.Lib;
 import OptionsMenu.Options;
 import flixel.input.keyboard.FlxKey;
@@ -53,6 +55,8 @@ using StringTools;
 
 class PlayState extends MusicBeatState
 {
+	public static var instance:PlayState = new PlayState();
+
 	public static var curStage:String = '';
 	public static var SONG:SwagSong;
 	public static var isStoryMode:Bool = false;
@@ -218,8 +222,7 @@ class PlayState extends MusicBeatState
 			case 'thorns':
 				dialogue = CoolUtil.coolTextFile(Paths.txt('thorns/thornsDialogue'));
 		}
-
-		#if desktop
+	
 		// Making difficulty text for Discord Rich Presence.
 		switch (storyDifficulty)
 		{
@@ -231,6 +234,7 @@ class PlayState extends MusicBeatState
 				storyDifficultyText = "Hard";
 		}
 
+		#if desktop
 		iconRPC = SONG.player2;
 
 		// To avoid having duplicate images in Discord assets
@@ -773,11 +777,11 @@ class PlayState extends MusicBeatState
 		scoreTxt.scrollFactor.set();
 		add(scoreTxt);
 
-		iconP1 = new HealthIcon(SONG.player1, true, curStage.contains("school"));
+		iconP1 = new HealthIcon(SONG.player1, true);
 		iconP1.y = healthBar.y - (iconP1.height / 2);
 		add(iconP1);
 
-		iconP2 = new HealthIcon(SONG.player2, false, curStage.contains("school"));
+		iconP2 = new HealthIcon(SONG.player2, false);
 		iconP2.y = healthBar.y - (iconP2.height / 2);
 		add(iconP2);
 
@@ -849,7 +853,13 @@ class PlayState extends MusicBeatState
 			}
 		}
 
+		Lib.application.window.title = "engine thing ill be doing but has no name right now - " + SONG.song + " (" + storyDifficultyText +")";
+
 		KeyBinds.loadKeybinds();
+
+		//uhh lol
+		if (OptionsMenu.options.middleScroll)
+			opponentStrums.forEach(spr->{spr.visible=false;});
 
 		FlxG.stage.addEventListener(KeyboardEvent.KEY_DOWN, press);
 		FlxG.stage.addEventListener(KeyboardEvent.KEY_UP, release);
@@ -1285,7 +1295,7 @@ class PlayState extends MusicBeatState
 
 			babyArrow.animation.play('static');
 			babyArrow.x += 100;
-			babyArrow.x += ((FlxG.width / 2) * player);
+			babyArrow.x += (OptionsMenu.options.middleScroll ? (FlxG.width / 2) / 2 : (FlxG.width / 2) * player); //literaly just gonna guess
 
 			strums.add(babyArrow);
 		}
@@ -1362,7 +1372,7 @@ class PlayState extends MusicBeatState
 	
 	override public function onFocusLost():Void
 	{
-		if (!paused)
+		if (!paused && !endingSong && canPause)
 		{
 			persistentUpdate = false;
 			persistentDraw = true;
@@ -1370,9 +1380,11 @@ class PlayState extends MusicBeatState
 
 			// 1 / 1000 chance for Gitaroo Man easter egg
 			if (FlxG.random.bool(0.1))
-				FlxG.switchState(new GitarooPause());
+				FlxG.switchState(new GitarooPause());//this might be annoying might remove it idk lmao
 			else
 				openSubState(new PauseSubState(boyfriend.getScreenPosition().x, boyfriend.getScreenPosition().y));
+
+			Lib.application.window.title += " (PAUSED)";
 		}
 			
 		#if desktop
@@ -1442,6 +1454,8 @@ class PlayState extends MusicBeatState
 				FlxG.switchState(new GitarooPause());
 			else
 				openSubState(new PauseSubState(boyfriend.getScreenPosition().x, boyfriend.getScreenPosition().y));
+
+			Lib.application.window.title += " (PAUSED)";
 				
 			#if desktop
 			DiscordClient.changePresence(detailsPausedText, SONG.song + " (" + storyDifficultyText + ")", iconRPC);
@@ -1676,12 +1690,14 @@ class PlayState extends MusicBeatState
 		{
 			notes.forEachAlive(function(daNote:Note)
 			{
+				if (OptionsMenu.options.middleScroll && !daNote.mustPress) daNote.visible = false;
+
 				if (OptionsMenu.options.downScroll) {
 					daNote.y = (daNote.mustPress ? playerStrums.members[daNote.noteData] : opponentStrums.members[daNote.noteData]).y + 0.45
 					* (Conductor.songPosition - daNote.strumTime) * FlxMath.roundDecimal(SONG.speed, 2);
 					if (daNote.isSustainNote) {
 						if (daNote.animation.curAnim.name.endsWith("end") && daNote.prevNote != null)
-							daNote.y += daNote.prevNote.height + 10.75;
+							daNote.y += daNote.prevNote.height + (SONG.speed * 3.5);
 						else 
 							daNote.y += daNote.height / 2;
 						
@@ -1781,6 +1797,22 @@ class PlayState extends MusicBeatState
 			#end
 		}
 
+		var data = {
+			title:'${SONG.song} (${storyDifficultyText}) completed!',
+			fields:[
+				{
+					name: "Song statistics:",
+					value: "Score: " + songScore + " | Misses: " + misses + " | Accuracy: " + accuracy
+				},
+				{
+					name: "Ratings:",
+					value: "Sicks: " + sicks + " | Goods: " + goods + " | Bads: " + bads + " | Shits: " + shits
+				}
+			]	
+		};
+
+		
+
 		if (isStoryMode)
 		{
 			campaignScore += songScore;
@@ -1789,9 +1821,6 @@ class PlayState extends MusicBeatState
 
 			if (storyPlaylist.length <= 0)
 			{
-				FlxG.stage.removeEventListener(KeyboardEvent.KEY_DOWN, press);
-				FlxG.stage.removeEventListener(KeyboardEvent.KEY_UP, release);
-
 				FlxG.sound.playMusic(Paths.music('freakyMenu'));
 
 				transIn = FlxTransitionableState.defaultTransIn;
@@ -1841,16 +1870,20 @@ class PlayState extends MusicBeatState
 				PlayState.SONG = Song.loadFromJson(PlayState.storyPlaylist[0].toLowerCase() + difficulty, PlayState.storyPlaylist[0]);
 				FlxG.sound.music.stop();
 
+				Lib.application.window.title = "engine thing ill be doing but has no name right now";
+
 				LoadingState.loadAndSwitchState(new PlayState());
 			}
 		}
 		else
 		{
 			trace('WENT BACK TO FREEPLAY??');
+			Lib.application.window.title = "engine thing ill be doing but has no name right now";
 			FlxG.switchState(new FreeplayState());
-			FlxG.stage.removeEventListener(KeyboardEvent.KEY_DOWN, press);
-			FlxG.stage.removeEventListener(KeyboardEvent.KEY_UP, release);
 		}
+
+		FlxG.stage.removeEventListener(KeyboardEvent.KEY_DOWN, press);
+		FlxG.stage.removeEventListener(KeyboardEvent.KEY_UP, release);
 	}
 
 	var endingSong:Bool = false;
@@ -2173,7 +2206,7 @@ class PlayState extends MusicBeatState
 
 		if (boyfriend.holdTimer > Conductor.stepCrochet * 0.004 && !pressed.contains(true) &&
 			boyfriend.animation.curAnim.name.startsWith('sing') && !boyfriend.animation.curAnim.name.endsWith('miss'))
-				boyfriend.playAnim('idle');
+				boyfriend.dance();
 
 		playerStrums.forEach(function(spr:FlxSprite)
 		{
@@ -2201,7 +2234,7 @@ class PlayState extends MusicBeatState
 		{
 			if (combo > 5 && gf.animOffsets.exists('sad'))
 			{
-				gf.playAnim('sad');
+				gf.playAnim('sad', true);
 			}
 			combo = 0;
 
@@ -2449,7 +2482,7 @@ class PlayState extends MusicBeatState
 
 		if (!boyfriend.animation.curAnim.name.startsWith("sing"))
 		{
-			boyfriend.playAnim('idle');
+			boyfriend.dance();
 		}
 
 		if (curBeat % 8 == 7 && curSong == 'Bopeebo')

@@ -3,6 +3,9 @@ package;
 import sys.FileSystem;
 import flixel.FlxSprite;
 
+
+using StringTools;
+
 class HealthIcon extends FlxSprite
 {
 	/**
@@ -10,25 +13,50 @@ class HealthIcon extends FlxSprite
 	 */
 	public var sprTracker:FlxSprite;
 
-	public function new(char:String = 'bf', isPlayer:Bool = false, isPixel:Bool = false)
+	var isOldIcon:Bool = false;
+	var isPlayer:Bool = false;
+
+	public var char:String = '';
+
+	public function new(char:String = 'bf', isPlayer:Bool = false)
 	{
 		super();
 
-		//IM SO FUCKING STUPID ill change this later 
-		if (FileSystem.exists(Paths.image('icons/icon-' + char + (char == "senpai" || char == "senpai-angry" || char == "spirit" ? '-pixel' : ""))))
-			loadGraphic(Paths.image('icons/icon-' + char + (char == "senpai" || char == "senpai-angry" || char == "spirit" ? '-pixel' : "")), true, 150, 150);
-		else
-			loadGraphic(Paths.image('icons/icon-face'), true, 150, 150);
+		isOldIcon = false;
+		this.isPlayer = isPlayer;
 
-		if (char == "senpai" || char == "senpai-angry" || char == "spirit")
-			antialiasing = true;
-		else
-			antialiasing = OptionsMenu.options.antialiasing;
+        changeIcon(char);
+		this.char = char;
+       	antialiasing = OptionsMenu.options.antialiasing;
+        scrollFactor.set();
+	}
 
-		animation.add(char, [0, 1], 0, false, isPlayer);
-		
-		animation.play(char);
-		scrollFactor.set();
+	public function swapOldIcon()
+	{
+		if (isOldIcon) changeIcon("bf");
+		else changeIcon("bf-old");
+	}
+
+	public function changeIcon(character:String) {
+		if (character != "bf-pixel" && character != "bf-old")
+			character = character.split("-")[0].trim();
+
+		if (character.endsWith("-pixel"))
+			antialiasing = false;
+
+		if (char != character)
+		{
+			if (animation.getByName(character) == null)
+			{
+				if (FileSystem.exists(Paths.image("icons/icon-" + character)))
+					loadGraphic(Paths.image("icons/icon-" + character), true, 150, 150);
+				else 
+					loadGraphic(Paths.image("icons/icon-face"), true, 150, 150);
+				animation.add(character, [0, 1], 0, false, isPlayer);
+			}
+			animation.play(character);
+			char = character;
+		}
 	}
 
 	override function update(elapsed:Float)
