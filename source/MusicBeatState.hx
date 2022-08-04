@@ -12,8 +12,9 @@ class MusicBeatState extends FlxUIState
 	private var lastBeat:Float = 0;
 	private var lastStep:Float = 0;
 
-	private var curStep:Int = 0;
-	private var curBeat:Int = 0;
+	public var curStep:Int = 0;
+	public var curBeat:Int = 0;
+	
 	private var controls(get, never):Controls;
 
 	inline function get_controls():Controls
@@ -64,10 +65,10 @@ class MusicBeatState extends FlxUIState
 
 	public function stepHit():Void
 	{
-		try{
+		try {
 			if (curStep % 4 == 0)
 				beatHit();
-		}catch(e){}
+		} catch(e) {}
 	}
 
 	public function beatHit():Void

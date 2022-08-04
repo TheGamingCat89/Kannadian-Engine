@@ -1,5 +1,6 @@
 package;
 
+import flixel.math.FlxMath;
 import flixel.tweens.FlxTween;
 import flixel.tweens.FlxEase;
 import flixel.FlxCamera.FlxCameraFollowStyle;
@@ -16,6 +17,7 @@ typedef Options =
 	@:optional public var middleScroll:Bool;
 	@:optional public var songPosition:Bool;
 	@:optional public var resetButton:Bool;
+	@:optional public var showRating:Bool;
 	@:optional public var antialiasing:Bool;
 	@:optional public var flashing:Bool;
 	@:optional public var cameraZoom:Bool;
@@ -41,6 +43,7 @@ class OptionsMenu extends MusicBeatState
 			"Song Position" => FlxG.save.data.songPosition,
 			"Reset Button" => FlxG.save.data.resetButton,
 			"Simple Accuracy" => FlxG.save.data.simpleAccuracy,
+			"Show Rating" => FlxG.save.data.showRating,
 			"Key Bindings" => null //uhhh i dont think thats needed
 		],
 		"Appearance" => [
@@ -83,6 +86,8 @@ class OptionsMenu extends MusicBeatState
 
 		if (FlxG.sound.music != null)
 			Conductor.songPosition = FlxG.sound.music.time;
+
+		bg.scale.x = bg.scale.y = FlxMath.lerp(bg.scale.x, 1, CoolUtil.lerpShit(elapsed, 9.8));
 
 		if (FlxG.keys.justPressed.UP)
 			changeSelection(-1);
@@ -141,6 +146,9 @@ class OptionsMenu extends MusicBeatState
 					case "Simple Accuracy":
 						optionsMap[curSelectedCatText][grpOptions.members[curOptSelected].text] = !optionsMap[curSelectedCatText][grpOptions.members[curOptSelected].text];
 						FlxG.save.data.simpleAccuracy = optionsMap[curSelectedCatText][grpOptions.members[curOptSelected].text];
+					case "Show Rating":
+						optionsMap[curSelectedCatText][grpOptions.members[curOptSelected].text] = !optionsMap[curSelectedCatText][grpOptions.members[curOptSelected].text];
+						FlxG.save.data.showRating = optionsMap[curSelectedCatText][grpOptions.members[curOptSelected].text];
 					case "Key Bindings":
 						openSubState(new KeyBinds());
 					case "Antialiasing":
@@ -231,9 +239,11 @@ class OptionsMenu extends MusicBeatState
 		if (OptionsMenu.options.cameraZoom)
 		{
 			camera.shake(0.001, 0.05);
-			bg.scale.set(1.02, 1.02);
-			FlxTween.tween(bg.scale, {x: 1, y: 1}, 0.05, {ease: FlxEase.sineIn});
+			bg.scale.x = bg.scale.y = 1.02;
 		}
+
+		if (PlayState.SONG.notes[Math.floor(curStep / 16)] != null && PlayState.SONG.notes[Math.floor(curStep / 16)].changeBPM)
+			Conductor.changeBPM(PlayState.SONG.notes[Math.floor(curStep / 16)].bpm);
 	}
 
 	public static function loadSettings()
@@ -245,6 +255,7 @@ class OptionsMenu extends MusicBeatState
 			middleScroll: FlxG.save.data.middleScroll,
 			songPosition: FlxG.save.data.songPosition,
 			resetButton: FlxG.save.data.resetButton,
+			showRating: FlxG.save.data.showRating,
 			antialiasing: FlxG.save.data.antialiasing,
 			flashing: FlxG.save.data.flashing,
 			cameraZoom: FlxG.save.data.cameraZoom

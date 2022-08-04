@@ -17,8 +17,3 @@ senpai:ffaa6f
 senpai-angry:ffaa6f
 spirit:ff3c6e
 parents-christmas:c555d7
-sarvente:f691c5
-sarvente-dark:ff60b2
-ruv:978aa6
-sarvente-lucifer:da317d
-selever:972651

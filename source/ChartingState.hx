@@ -1,5 +1,7 @@
 package;
 
+import flixel.input.keyboard.FlxKey;
+import openfl.events.KeyboardEvent;
 import Conductor.BPMChangeEvent;
 import Section.SwagSection;
 import Song.SwagSong;
@@ -169,6 +171,8 @@ class ChartingState extends MusicBeatState
 		add(curRenderedNotes);
 		add(curRenderedSustains);
 
+		FlxG.stage.addEventListener(KeyboardEvent.KEY_DOWN, press);
+
 		super.create();
 	}
 
@@ -223,7 +227,7 @@ class ChartingState extends MusicBeatState
 		stepperBPM.value = Conductor.bpm;
 		stepperBPM.name = 'song_bpm';
 
-		var characters:Array<String> = CoolUtil.coolTextFile(Paths.txt('characterList'));
+		var characters:Array<String> = CoolUtil.coolTextFile(Paths.txt('data/characterList'));
 
 		var player1DropDown = new FlxUIDropDownMenu(10, 100, FlxUIDropDownMenu.makeStrIdLabelArray(characters, true), function(character:String)
 		{
@@ -521,7 +525,8 @@ class ChartingState extends MusicBeatState
 					&& FlxG.mouse.y < gridBG.y + (GRID_SIZE * _song.notes[curSection].lengthInSteps))
 				{
 					FlxG.log.add('added note');
-					addNote();
+					addNote(getStrumTime(dummyArrow.y) + sectionStartTime(), Math.floor(FlxG.mouse.x / GRID_SIZE));
+					
 				}
 			}
 		}
@@ -938,22 +943,18 @@ class ChartingState extends MusicBeatState
 		updateGrid();
 	}
 
-	private function addNote():Void
+	private function addNote(strumTime:Float, noteData:Int, sus:Float = 0):Void
 	{
-		var noteStrum = getStrumTime(dummyArrow.y) + sectionStartTime();
-		var noteData = Math.floor(FlxG.mouse.x / GRID_SIZE);
-		var noteSus = 0;
-
-		_song.notes[curSection].sectionNotes.push([noteStrum, noteData, noteSus]);
+		_song.notes[curSection].sectionNotes.push([strumTime, noteData, sus]);
 
 		curSelectedNote = _song.notes[curSection].sectionNotes[_song.notes[curSection].sectionNotes.length - 1];
 
 		if (FlxG.keys.pressed.CONTROL)
 		{
-			_song.notes[curSection].sectionNotes.push([noteStrum, (noteData + 4) % 8, noteSus]);
+			_song.notes[curSection].sectionNotes.push([strumTime, (noteData + 4) % 8, sus]);
 		}
 
-		trace(noteStrum);
+		trace(strumTime);
 		trace(curSection);
 
 		updateGrid();
@@ -995,6 +996,29 @@ class ChartingState extends MusicBeatState
 
 			return daLength;
 	}*/
+
+	function press(event:KeyboardEvent)
+	{	
+		
+		var binds =  [
+			KeyBinds.keybinds["left"][0],
+			KeyBinds.keybinds["down"][0],
+			KeyBinds.keybinds["up"][0],
+			KeyBinds.keybinds["right"][0]
+		];
+
+		var keyData = -1;
+
+		for (i => bind in binds)
+			if (event.keyCode == bind)
+				keyData = i;//note data (aka 0, 1, 2, 3)
+
+		if (keyData == -1)
+			return;
+
+		addNote(Conductor.songPosition, keyData);
+	}
+
 	private var daSpacing:Float = 0.3;
 
 	function loadLevel():Void
@@ -1082,5 +1106,11 @@ class ChartingState extends MusicBeatState
 		_file.removeEventListener(IOErrorEvent.IO_ERROR, onSaveError);
 		_file = null;
 		FlxG.log.error("Problem saving Level data");
+	}
+
+	override function destroy() {
+		FlxG.stage.removeEventListener(KeyboardEvent.KEY_DOWN, press);
+
+		super.destroy();
 	}
 }

@@ -1,5 +1,6 @@
 package;
 
+import lime.app.Application;
 import openfl.Lib;
 import Controls.Control;
 import flixel.FlxG;
@@ -108,19 +109,13 @@ class PauseSubState extends MusicBeatSubstate
 					close();
 					var diff = "";
 					switch (PlayState.storyDifficulty) {case 0: diff = "Easy"; case 1: diff = "Normal"; case 2: diff = "Hard";}
-					Lib.application.window.title = "engine thing ill be doing but has no name right now - " + PlayState.SONG.song + " (" + diff + ")";
+					Lib.application.window.title = Application.current.meta.get("name") + " - " + PlayState.SONG.song + " (" + diff + ")";
 				case "Restart Song":
 					FlxG.resetState();
 				case "Exit to menu":
 					FlxG.switchState((PlayState.isStoryMode ? new StoryMenuState() : new FreeplayState()));
-					Lib.application.window.title = "engine thing ill be doing but has no name right now";
+					Lib.application.window.title = Application.current.meta.get("name");
 			}
-		}
-
-		if (FlxG.keys.justPressed.J)
-		{
-			// for reference later!
-			// PlayerSettings.player1.controls.replaceBinding(Control.LEFT, Keys, FlxKey.J, null);
 		}
 	}
 

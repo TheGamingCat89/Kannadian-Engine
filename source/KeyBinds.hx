@@ -10,18 +10,19 @@ import flixel.FlxG;
 import flixel.group.FlxGroup.FlxTypedGroup;
 import flixel.input.keyboard.FlxKey;
 
+//!also improve menu because it sucks
 /**
     will work as menu and as data saver or some shit
 **/
 class KeyBinds extends MusicBeatSubstate
 {
-    var grpKeybinds:FlxTypedGroup<Alphabet>;
-    var grpCurKeys:FlxTypedGroup<Alphabet>;
+    var grpKeybinds:FlxTypedGroup<Alphabet>;//direction keybind text
     var curSelected:Int;
     
     var text:FlxText;
     static public var keybinds:Map<String, Array<FlxKey>>;
     var e:Array<FlxKey> = [27, 20, 13, 18, 8];
+    var lastPressed:FlxKey = -1;
 
     override function create() {
 
@@ -34,19 +35,14 @@ class KeyBinds extends MusicBeatSubstate
         grpKeybinds = new FlxTypedGroup<Alphabet>();
         add(grpKeybinds);
 
-        grpCurKeys = new FlxTypedGroup<Alphabet>();
-        add(grpCurKeys);
-
         var i = 0; // no count variable waa
         for (key => value in keybinds)
         {
-            var thing = new Alphabet(0,0, key + " keybind: " + value, true);
+            var thing = new Alphabet(0,0, key + " keybind - " + value[0].toString(), true);
             thing.isMenuItem = true;
             thing.targetY = i;
             grpKeybinds.add(thing);
 
-            var currentKey = new Alphabet(thing.x + thing.widthOfWords + 50, thing.y, value[0].toString(), true);
-            grpCurKeys.add(currentKey);
             i++;
         }
 
@@ -72,21 +68,24 @@ class KeyBinds extends MusicBeatSubstate
             changeSelection(1);
 
         if (FlxG.keys.justPressed.ESCAPE)
-            close();
-
-        if(FlxG.keys.justReleased.ENTER)
-        {         
-            new FlxTimer().start(1, timer -> 
-            {
-                text.visible = true;
-                settingKeybind = true;
-            });
+        {
+            FlxG.sound.play(Paths.sound('cancelMenu'));
+            if (settingKeybind)
+                settingKeybind = text.visible = false;
+            else
+                close();
         }
+
+        if(FlxG.keys.justPressed.ENTER)
+            text.visible = settingKeybind = true;
 
         if(settingKeybind && FlxG.keys.justPressed.ANY && !FlxG.keys.anyJustPressed(e))
         {
+            FlxG.sound.play(Paths.sound('confirmMenu'));
+
             trace(grpKeybinds.members[curSelected].text.split(" ")[0] + ": " + keybinds[grpKeybinds.members[curSelected].text.split(" ")[0]][0]);
             keybinds[grpKeybinds.members[curSelected].text.split(" ")[0]][0] = FlxG.keys.firstJustPressed();
+            lastPressed = -1;
             trace(grpKeybinds.members[curSelected].text.split(" ")[0] + ": " + keybinds[grpKeybinds.members[curSelected].text.split(" ")[0]][0]);
 
             //IHATE THAT I HAVE TO DO THIS IM SORRY
@@ -94,7 +93,7 @@ class KeyBinds extends MusicBeatSubstate
             {
                 //PLEASE WORK
                 case "left":
-                    FlxG.save.data.leftBind = keybinds[grpKeybinds.members[curSelected].text.split(" ")[0]][0].toString();//should be a string number
+                    FlxG.save.data.leftBind = keybinds[grpKeybinds.members[curSelected].text.split(" ")[0]][0].toString();
                 case "down":
                     FlxG.save.data.downBind = keybinds[grpKeybinds.members[curSelected].text.split(" ")[0]][0].toString();
                 case "up":
@@ -102,24 +101,26 @@ class KeyBinds extends MusicBeatSubstate
                 case "right":
                     FlxG.save.data.rightBind = keybinds[grpKeybinds.members[curSelected].text.split(" ")[0]][0].toString();
             }
-            grpKeybinds.members[curSelected].text += keybinds[grpKeybinds.members[curSelected].text.split(" ")[0]][0].toString();
+            grpKeybinds.members[curSelected].changeText(grpKeybinds.members[curSelected].text.split(" ")[0] + " keybind - " + keybinds[grpKeybinds.members[curSelected].text.split(" ")[0]][0].toString());
             FlxG.save.flush();
-            text.visible = false;
-            settingKeybind = false;
+            settingKeybind = text.visible = false;
         }
     }
 
     function changeSelection(change:Int = 0)
     {
+        //sound fuck you
+        FlxG.sound.play(Paths.sound('scrollMenu'));
+
         curSelected += change;
-        //no sound fuck you
+
         if (curSelected > 3)
             curSelected = 0;
         if (curSelected < 0)
             curSelected = 3;
 
         var bullShit:Int = 0;
-        grpKeybinds.forEach((key) -> { //ilike this more than function(sth:blah)
+        grpKeybinds.forEach(key -> { //ilike this more than function(sth:blah)
             key.targetY = bullShit - curSelected;
 			bullShit++;
 

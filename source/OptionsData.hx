@@ -5,6 +5,7 @@ import flixel.FlxG;
 
 class OptionsData
 {
+    //sorry for this LMAO
     public static function init()
     {    
         if (FlxG.save.data.volume == null)
@@ -28,6 +29,8 @@ class OptionsData
             FlxG.save.data.cameraZoom = false;
         if (FlxG.save.data.simpleAccuracy == null)
             FlxG.save.data.simpleAccuracy = true;
+        if (FlxG.save.data.showRating == null)
+            FlxG.save.data.showRating = true;
 
         if (FlxG.save.data.upBind == null)
             FlxG.save.data.upBind =  W.toString();
@@ -53,6 +56,7 @@ class OptionsData
         FlxG.save.data.flashing = null;
         FlxG.save.data.cameraZoom = null;
         FlxG.save.data.simpleAccuracy = null;
+        FlxG.save.data.showRating = null;
         FlxG.save.data.upBind = null;
         FlxG.save.data.downBind = null;
         FlxG.save.data.leftBind = null;

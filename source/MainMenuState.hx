@@ -96,7 +96,7 @@ class MainMenuState extends MusicBeatState
 
 		FlxG.camera.follow(camFollow, null, 0.6 / FlxG.updateFramerate);
 
-		var versionShit:FlxText = new FlxText(5, FlxG.height - 18, 0, "engine thing ill be doing but has no name right now - v" + Main.version, 12);
+		var versionShit:FlxText = new FlxText(5, FlxG.height - 18, 0, Application.current.meta.get("name") + " - v" + Main.version, 12);
 		versionShit.scrollFactor.set();
 		versionShit.setFormat("VCR OSD Mono", 16, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		add(versionShit);
@@ -116,6 +116,9 @@ class MainMenuState extends MusicBeatState
 	{
 		if (FlxG.sound.music.volume < 0.8)
 			FlxG.sound.music.volume += 0.5 * FlxG.elapsed;
+
+		if (FlxG.sound.music != null)
+			Conductor.songPosition = FlxG.sound.music.time;
 
 		if (!selectedSomethin)
 		{
@@ -201,5 +204,13 @@ class MainMenuState extends MusicBeatState
 
 			spr.updateHitbox();
 		});
+	}
+
+	//ill see if im gonna add some beat related effects i dunno
+	override function beatHit() {
+		super.beatHit();
+
+		if (PlayState.SONG.notes[Math.floor(curStep / 16)] != null && PlayState.SONG.notes[Math.floor(curStep / 16)].changeBPM)
+			Conductor.changeBPM(PlayState.SONG.notes[Math.floor(curStep / 16)].bpm);
 	}
 }

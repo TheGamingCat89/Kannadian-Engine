@@ -446,5 +446,8 @@ class StoryMenuState extends MusicBeatState
 		grpWeekCharacters.members[0].dance();
 		grpWeekCharacters.members[1].dance();
 		grpWeekCharacters.members[2].dance();
+
+		if (PlayState.SONG.notes[Math.floor(curStep / 16)] != null && PlayState.SONG.notes[Math.floor(curStep / 16)].changeBPM)
+			Conductor.changeBPM(PlayState.SONG.notes[Math.floor(curStep / 16)].bpm);
 	}
 }

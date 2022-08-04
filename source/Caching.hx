@@ -1,7 +1,6 @@
 package;
 
 
-#if sys
 import Discord.DiscordClient;
 import flixel.graphics.FlxGraphic;
 #if cpp
@@ -42,6 +41,8 @@ class Caching extends MusicBeatState
 		logo.setGraphicSize(Std.int(logo.width * 0.3));		
 		logo.antialiasing = OptionsMenu.options.antialiasing;
 		add(logo);
+		trace(logo);
+		trace(Paths.image('preloaderArt'));
 
 		#if cpp
 		Thread.create(() -> {
@@ -52,7 +53,7 @@ class Caching extends MusicBeatState
 		#end
 	}
 
-	public function preload()
+	private function preload()
 	{
 		trace("caching shit");
 
@@ -67,8 +68,12 @@ class Caching extends MusicBeatState
             if (file.endsWith(".png") && !blacklist.contains(file))
                 FlxG.bitmap.add(Paths.image(file.split(".")[0]));
 
+		for(file in FileSystem.readDirectory(FileSystem.absolutePath("assets/shared/images/characters")))
+			if (file.endsWith(".png"))
+				FlxG.bitmap.add(Paths.image('characters/' + file.split(".")[0], 'shared'));
+
 		//I HOPE IT WORKS :SOB:
-		for (i in 1...6) //each folder
+		/*for (i in 1...6) //each folder
 			for (HII in FileSystem.readDirectory(FileSystem.absolutePath("assets/week" + i))) //HII = images folder
 				try { 
 					for (fuck in FileSystem.readDirectory(FileSystem.absolutePath(HII)))//IMAGE OR FOLDER INSIDE OF IMAGES FOLDER
@@ -87,13 +92,8 @@ class Caching extends MusicBeatState
 							} catch (e) { trace(e); }
 						}
 					}
-				} catch(e) {trace(e); }
-
-		remove(logo);
-		logo.kill();
-		logo.destroy();
+				} catch(e) {trace(e); }*/
 
 		LoadingState.loadAndSwitchState(new TitleState());
 	}
 }
-#end

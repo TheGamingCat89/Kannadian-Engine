@@ -1,5 +1,10 @@
 package;
 
+#if cpp
+import cpp.Lib;
+#end
+import openfl.system.System;
+import haxe.CallStack;
 import openfl.media.SoundLoaderContext;
 import flixel.addons.display.shapes.FlxShapeDonut;
 import flixel.system.FlxSoundGroup;
@@ -198,7 +203,7 @@ class TitleState extends MusicBeatState
 
 	function getIntroTextShit():Array<Array<String>>
 	{
-		var fullText:String = Assets.getText(Paths.txt('introText'));
+		var fullText:String = Assets.getText(Paths.txt('data/introText'));
 
 		var firstArray:Array<String> = fullText.split('\n');
 		var swagGoodArray:Array<Array<String>> = [];
@@ -318,6 +323,9 @@ class TitleState extends MusicBeatState
 			gfDance.animation.play('danceLeft', true);
 
 		FlxG.log.add(curBeat);
+
+		//if (PlayState.SONG.notes[Math.floor(curStep / 16)] != null && PlayState.SONG.notes[Math.floor(curStep / 16)].changeBPM)
+			//Conductor.changeBPM(PlayState.SONG.notes[Math.floor(curStep / 16)].bpm);
 
 		switch (curBeat)
 		{

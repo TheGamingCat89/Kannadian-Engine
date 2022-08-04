@@ -1,0 +1,27 @@
+<?xml version='1.0' encoding='utf-8'?>
+<TextureAtlas imagePath="Sarvente.png">
+<SubTexture name="Sarvente idle0000" x="1844" y="1612" width="439" height="766" frameX="-279" frameY="-125" frameWidth="1000" frameHeight="1000" />
+<SubTexture name="Sarvente idle0001" x="1394" y="1612" width="450" height="769" frameX="-273" frameY="-122" frameWidth="1000" frameHeight="1000" />
+<SubTexture name="Sarvente idle0002" x="935" y="1612" width="459" height="771" frameX="-268" frameY="-120" frameWidth="1000" frameHeight="1000" />
+<SubTexture name="Sarvente idle0003" x="0" y="1612" width="468" height="775" frameX="-266" frameY="-116" frameWidth="1000" frameHeight="1000" />
+<SubTexture name="Sarvente idle0004" x="468" y="1612" width="467" height="774" frameX="-266" frameY="-117" frameWidth="1000" frameHeight="1000" />
+<SubTexture name="Sarvente left0000" x="1658" y="0" width="509" height="778" frameX="-209" frameY="-112" frameWidth="1000" frameHeight="1000" />
+<SubTexture name="Sarvente left0001" x="862" y="831" width="487" height="779" frameX="-213" frameY="-111" frameWidth="1000" frameHeight="1000" />
+<SubTexture name="Sarvente left0002" x="0" y="831" width="429" height="781" frameX="-227" frameY="-109" frameWidth="1000" frameHeight="1000" />
+<SubTexture name="Sarvente left0003" x="429" y="831" width="433" height="781" frameX="-227" frameY="-109" frameWidth="1000" frameHeight="1000" />
+<SubTexture name="Sarvente up0000" x="0" y="0" width="459" height="831" frameX="-259" frameY="-65" frameWidth="1000" frameHeight="1000" />
+<SubTexture name="Sarvente up0001" x="459" y="0" width="461" height="831" frameX="-248" frameY="-65" frameWidth="1000" frameHeight="1000" />
+<SubTexture name="Sarvente up0002" x="920" y="0" width="369" height="827" frameX="-311" frameY="-69" frameWidth="1000" frameHeight="1000" />
+<SubTexture name="Sarvente up0003" x="1289" y="0" width="369" height="827" frameX="-309" frameY="-69" frameWidth="1000" frameHeight="1000" />
+<SubTexture name="Sarvente down0000" x="2045" y="2387" width="540" height="675" frameX="-219" frameY="-218" frameWidth="1000" frameHeight="1000" />
+<SubTexture name="Sarvente down0001" x="1508" y="2387" width="537" height="683" frameX="-219" frameY="-210" frameWidth="1000" frameHeight="1000" />
+<SubTexture name="Sarvente down0002" x="966" y="2387" width="542" height="687" frameX="-211" frameY="-205" frameWidth="1000" frameHeight="1000" />
+<SubTexture name="Sarvente down0003" x="427" y="2387" width="539" height="689" frameX="-214" frameY="-205" frameWidth="1000" frameHeight="1000" />
+<SubTexture name="Sarvente right0000" x="2666" y="0" width="493" height="754" frameX="-325" frameY="-147" frameWidth="1000" frameHeight="1000" />
+<SubTexture name="Sarvente right0001" x="2666" y="754" width="472" height="753" frameX="-334" frameY="-148" frameWidth="1000" frameHeight="1000" />
+<SubTexture name="Sarvente right0002" x="2666" y="1507" width="414" height="752" frameX="-378" frameY="-149" frameWidth="1000" frameHeight="1000" />
+<SubTexture name="Sarvente right0003" x="0" y="2387" width="427" height="752" frameX="-372" frameY="-149" frameWidth="1000" frameHeight="1000" />
+<SubTexture name="Sarvente hey0000" x="2167" y="0" width="499" height="777" frameX="-243" frameY="-121" frameWidth="1000" frameHeight="1000" />
+<SubTexture name="Sarvente hey0001" x="1658" y="778" width="501" height="778" frameX="-240" frameY="-120" frameWidth="1000" frameHeight="1000" />
+<SubTexture name="Sarvente hey0002" x="2167" y="777" width="499" height="777" frameX="-243" frameY="-121" frameWidth="1000" frameHeight="1000" />
+</TextureAtlas>

@@ -1,8 +1,9 @@
 package;
 
+#if sys
 import sys.FileSystem;
+#end
 import flixel.FlxSprite;
-
 
 using StringTools;
 
@@ -48,10 +49,10 @@ class HealthIcon extends FlxSprite
 		{
 			if (animation.getByName(character) == null)
 			{
-				if (FileSystem.exists(Paths.image("icons/icon-" + character)))
+		#if sys if (FileSystem.exists(Paths.image("icons/icon-" + character))) #end
 					loadGraphic(Paths.image("icons/icon-" + character), true, 150, 150);
-				else 
-					loadGraphic(Paths.image("icons/icon-face"), true, 150, 150);
+		#if sys else 
+					loadGraphic(Paths.image("icons/icon-face"), true, 150, 150); #end
 				animation.add(character, [0, 1], 0, false, isPlayer);
 			}
 			animation.play(character);

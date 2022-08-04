@@ -1,0 +1,47 @@
+{
+    "name":"dad",
+    "animations":[
+        {
+            "name":"idle",
+            "prefix":"Dad idle dance",
+            "offset": [0, 0],
+            "framerate":24,
+            "looped": false
+        },
+        {
+            "name":"singUP",
+            "prefix":"Dad Sing Note UP",
+            "offset": [-6, 50],
+            "framerate":24,
+            "looped": false
+        },
+        {
+            "name":"singRIGHT",
+            "prefix":"Dad Sing Note RIGHT",
+            "offset": [0, 27],
+            "framerate":24,
+            "looped": false
+        },
+        {
+            "name":"singDOWN",
+            "prefix":"Dad Sing Note DOWN",
+            "offset": [0, -30],
+            "framerate":24,
+            "looped": false
+        },
+        {
+            "name":"singLEFT",
+            "prefix":"Dad Sing Note LEFT",
+            "offset": [-10, 10],
+            "framerate":24,
+            "looped": false
+        }
+    ],
+    "path":"DADDY_DEAREST",
+    "icon": {
+        "icon":"dad",
+        "color":"#FFaf66ce"
+    },
+    "flipped":false,
+    "antialiasing":true
+}
