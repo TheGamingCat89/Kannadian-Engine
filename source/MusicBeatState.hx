@@ -1,5 +1,9 @@
 package;
 
+import openfl.ui.Keyboard;
+import openfl.events.KeyboardEvent;
+import openfl.events.EventType;
+import openfl.events.Event;
 import Conductor.BPMChangeEvent;
 import flixel.FlxG;
 import flixel.addons.transition.FlxTransitionableState;
@@ -25,8 +29,22 @@ class MusicBeatState extends FlxUIState
 		if (transIn != null)
 			trace('reg ' + transIn.region);
 
+		FlxG.stage.addEventListener(KeyboardEvent.KEY_DOWN, keyDown);
+		FlxG.stage.addEventListener(KeyboardEvent.KEY_UP, keyUp);
+
 		super.create();
 	}
+
+	override function destroy()
+	{
+		FlxG.stage.removeEventListener(KeyboardEvent.KEY_DOWN, keyDown);
+		FlxG.stage.removeEventListener(KeyboardEvent.KEY_UP, keyUp);
+		super.destroy();
+	}
+
+	private function keyDown(event:KeyboardEvent) {}
+
+	private function keyUp(event:KeyboardEvent) {}
 
 	override function update(elapsed:Float)
 	{
@@ -65,10 +83,7 @@ class MusicBeatState extends FlxUIState
 
 	public function stepHit():Void
 	{
-		try {
-			if (curStep % 4 == 0)
-				beatHit();
-		} catch(e) {}
+		try if (curStep % 4 == 0) beatHit() catch(_) 0;
 	}
 
 	public function beatHit():Void

@@ -2,8 +2,10 @@ package;
 
 //i forgot i was doing this LOL
 //ill work on it.. later
+import haxe.Exception;
+import openfl.ui.Keyboard;
+import lime.app.Application;
 import lime.system.System;
-import flixel.util.FlxColor;
 import flixel.util.FlxTimer;
 import flixel.tweens.FlxTween;
 import flixel.system.FlxSound;
@@ -12,21 +14,29 @@ import flixel.group.FlxGroup.FlxTypedGroup;
 import flixel.FlxObject;
 import flixel.FlxSprite;
 import flixel.FlxG;
+#if cpp
 import cpp.Lib;
-import lime.app.Application;
+#end
 import flixel.tweens.FlxEase;
+#if desktop
 import Discord.DiscordClient;
+#end
 import flixel.math.FlxMath;
 import openfl.Assets;
+#if sys
 import sys.FileSystem;
-import hscript.Expr;
+#end
 import hscript.Interp;
 import hscript.Parser;
+
+using StringTools;
+
 class HScript 
 {
     public var interpreter:Interp;
     public var variables:Map<String, Dynamic>;
     public var parser:Parser;
+    static private var hadError:Bool = false;
 
     //hope this works
     public function new(path:String)
@@ -35,10 +45,21 @@ class HScript
 #if sys if (FileSystem.exists(path)) #end
             file = Assets.getText(path);
 
+        if (hadError)
+        {
+            file = 'trace("Replaced script to continue gameplay");';
+            hadError = false;
+        }
+
         interpreter = new Interp();
         parser = new Parser();
-        
-        interpreter.execute(parser.parseString(file));
+        try {
+            interpreter.execute(parser.parseString(file));
+        } catch(e) {
+            Application.current.window.alert("line: " + parser.line, "Unexpected: " + e); //i forgot the parse shit but whatever
+            FlxG.resetState();
+            hadError = true;
+        }
 
         setVars();
     }
@@ -54,23 +75,26 @@ class HScript
 
     function setVars()
     {
-        //HELP
-
         //classes
-        interpreter.variables.set("CoolUtil", CoolUtil); //?
+        interpreter.variables.set("CoolUtil", CoolUtil);
         interpreter.variables.set("PlayState", PlayState);
         interpreter.variables.set("Paths", Paths);
         interpreter.variables.set("Alphabet", Alphabet);
         interpreter.variables.set("Character", Character);
         interpreter.variables.set("Conductor", Conductor);
+        #if desktop
         interpreter.variables.set("Discord", DiscordClient);
+        #end
         interpreter.variables.set("Note", Note);
         interpreter.variables.set("Song", Song);
-        interpreter.variables.set("Math", Math);
         interpreter.variables.set("Application", Application);
-        #if cpp interpreter.variables.set("Lib", Lib); #end
+        interpreter.variables.set("Keyboard", Keyboard);
+        interpreter.variables.set("Std", Std);
+        interpreter.variables.set("Options", OptionsMenu.options);
+        #if cpp
+        interpreter.variables.set("Lib", Lib);
+        #end
         #if sys 
-        interpreter.variables.set("FileSystem", FileSystem);
         interpreter.variables.set("System", System); 
         #end
         interpreter.variables.set("Assets", Assets);
@@ -79,7 +103,9 @@ class HScript
         interpreter.variables.set("FlxG", FlxG);
         interpreter.variables.set("FlxSprite", FlxSprite);
         interpreter.variables.set("FlxObject", FlxObject);
-        interpreter.variables.set("FlxTypedGroup", FlxTypedGroup);
+        interpreter.variables.set("FlxSpriteTypedGroup", function(limit:Int){
+            return new FlxTypedGroup<FlxSprite>(limit); //i hate this
+        });
         interpreter.variables.set("FlxMath", FlxMath);
         interpreter.variables.set("FlxText", FlxText);
         interpreter.variables.set("FlxSound", FlxSound);

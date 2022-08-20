@@ -1001,10 +1001,10 @@ class ChartingState extends MusicBeatState
 	{	
 		
 		var binds =  [
-			KeyBinds.keybinds["left"][0],
-			KeyBinds.keybinds["down"][0],
-			KeyBinds.keybinds["up"][0],
-			KeyBinds.keybinds["right"][0]
+			KeyBinds.keybinds[0][1][0],
+			KeyBinds.keybinds[1][1][0],
+			KeyBinds.keybinds[2][1][0],
+			KeyBinds.keybinds[3][1][0]
 		];
 
 		var keyData = -1;

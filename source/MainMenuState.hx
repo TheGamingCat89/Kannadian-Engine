@@ -1,5 +1,8 @@
 package;
 
+import openfl.ui.Keyboard;
+import flixel.input.keyboard.FlxKey;
+import openfl.events.KeyboardEvent;
 import openfl.Lib;
 #if desktop
 import Discord.DiscordClient;
@@ -45,9 +48,7 @@ class MainMenuState extends MusicBeatState
 		transOut = FlxTransitionableState.defaultTransOut;
 
 		if (!FlxG.sound.music.playing)
-		{
 			FlxG.sound.playMusic(Paths.music('freakyMenu'));
-		}
 
 		persistentUpdate = persistentDraw = true;
 
@@ -94,7 +95,7 @@ class MainMenuState extends MusicBeatState
 			menuItem.antialiasing = OptionsMenu.options.antialiasing;
 		}
 
-		FlxG.camera.follow(camFollow, null, 0.6 / FlxG.updateFramerate);
+		FlxG.camera.follow(camFollow, null,	CoolUtil.lerpShit(FlxG.elapsed, 5.3));
 
 		var versionShit:FlxText = new FlxText(5, FlxG.height - 18, 0, Application.current.meta.get("name") + " - v" + Main.version, 12);
 		versionShit.scrollFactor.set();
@@ -114,30 +115,68 @@ class MainMenuState extends MusicBeatState
 
 	override function update(elapsed:Float)
 	{
-		if (FlxG.sound.music.volume < 0.8)
-			FlxG.sound.music.volume += 0.5 * FlxG.elapsed;
-
 		if (FlxG.sound.music != null)
-			Conductor.songPosition = FlxG.sound.music.time;
+		{
+			if (FlxG.sound.music.volume < 0.8)
+				FlxG.sound.music.volume += 0.5 * FlxG.elapsed;
 
+			Conductor.songPosition = FlxG.sound.music.time;
+		}
+
+		super.update(elapsed);
+
+		menuItems.forEach(function(spr:FlxSprite)
+		{
+			spr.screenCenter(X);
+		});
+	}
+
+	function changeItem(huh:Int = 0)
+	{
+		FlxG.sound.play(Paths.sound('scrollMenu'));
+
+		curSelected += huh;
+
+		if (curSelected >= menuItems.length)
+			curSelected = 0;
+		if (curSelected < 0)
+			curSelected = menuItems.length - 1;
+
+		menuItems.forEach(function(spr:FlxSprite)
+		{
+			spr.animation.play('idle');
+
+			if (spr.ID == curSelected)
+			{
+				spr.animation.play('selected');
+				camFollow.setPosition(spr.getGraphicMidpoint().x, spr.getGraphicMidpoint().y);
+			}
+
+			spr.updateHitbox();
+		});
+	}
+
+	override function keyDown(event:KeyboardEvent)
+	{
 		if (!selectedSomethin)
 		{
-			if (controls.UP_P)
+			//WILL CHANGE THIS TO WORK WITH CUSTOMIZABLE KEYBINDS
+			if (event.keyCode == Keyboard.UP)
 				changeItem(-1);
-
-			if (controls.DOWN_P)
+	
+			if (event.keyCode == Keyboard.DOWN)
 				changeItem(1);
-
-			if (controls.BACK)
+	
+			if (event.keyCode == Keyboard.ESCAPE)
 				FlxG.switchState(new TitleState());
-
-			if (controls.ACCEPT)
+	
+			if (event.keyCode == Keyboard.ENTER)
 			{
 				selectedSomethin = true;
 				FlxG.sound.play(Paths.sound('confirmMenu'));
-
+	
 				FlxFlicker.flicker(magenta, 1.1, 0.15, false);
-
+	
 				menuItems.forEach(function(spr:FlxSprite)
 				{
 					if (curSelected != spr.ID)
@@ -173,37 +212,7 @@ class MainMenuState extends MusicBeatState
 			}
 		}
 
-		super.update(elapsed);
-
-		menuItems.forEach(function(spr:FlxSprite)
-		{
-			spr.screenCenter(X);
-		});
-	}
-
-	function changeItem(huh:Int = 0)
-	{
-		FlxG.sound.play(Paths.sound('scrollMenu'));
-
-		curSelected += huh;
-
-		if (curSelected >= menuItems.length)
-			curSelected = 0;
-		if (curSelected < 0)
-			curSelected = menuItems.length - 1;
-
-		menuItems.forEach(function(spr:FlxSprite)
-		{
-			spr.animation.play('idle');
-
-			if (spr.ID == curSelected)
-			{
-				spr.animation.play('selected');
-				camFollow.setPosition(spr.getGraphicMidpoint().x, spr.getGraphicMidpoint().y);
-			}
-
-			spr.updateHitbox();
-		});
+		super.keyDown(event);
 	}
 
 	//ill see if im gonna add some beat related effects i dunno

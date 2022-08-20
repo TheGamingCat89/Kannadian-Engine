@@ -1,5 +1,8 @@
 package;
 
+import openfl.ui.Keyboard;
+import openfl.events.KeyboardEvent;
+import haxe.Json;
 import OptionsMenu.Options;
 import flixel.util.FlxTimer;
 import lime.app.Application;
@@ -44,6 +47,7 @@ class FreeplayState extends MusicBeatState
 	var lerpScore:Int = 0;
 	var intendedScore:Int = 0;
 	var combo:String = '';
+	var authorTxt:FlxText;
 
 	var bg:FlxSprite;
 	var scoreBG:FlxSprite;
@@ -77,35 +81,38 @@ class FreeplayState extends MusicBeatState
 
 	override function create()
 	{
-		var initSonglist = CoolUtil.coolTextFile(Paths.txt('data/freeplaySonglist'));
+		//var initSonglist = CoolUtil.coolTextFile(Paths.txt('data/freeplaySonglist'));
 
 		songData = [];
 
 		weeks = [];
 		
+		//fuck html
+		#if html5 var weeksFiles = ["week0.json","week1.json","week2.json","week3.json","week4.json","week5.json","week6.json","week7.json"]; #end
+		
 		//loading data
-		for (list in initSonglist) // each week
+		for (file in #if sys FileSystem.readDirectory(FileSystem.absolutePath('assets/weeks'))#else weeksFiles #end) // each week
 		{
-			var weekData:Array<String> = list.split('/')[0].split(":");
-			var songsData:Array<String> = list.split('/')[1].split(":");
+			if (!file.endsWith(".json")) continue; //skip if its not a json
+
+			var weekData:WeekData = Json.parse(Assets.getText(Paths.json('weeks/' + file.split(".")[0])));
 	
 			var weekSongsShit:Array<FreeplaySongMetadata> = [];
 	
-			for (pre in songsData) // each song per week
+			for (song in weekData.songs) // each song per week
 			{
-				var data = pre.split("=");
-				var meta = new FreeplaySongMetadata(data[0], data[1]);
+				var meta = new FreeplaySongMetadata(song.name, song.character, song.author);
 				
 				var diffs = [];
 				var diffsThatExist = [];
 				
 				#if sys
-				if (FileSystem.exists('assets/data/${meta.songName}/${meta.songName}-hard.json'))
-					diffsThatExist.push("Hard");
 				if (FileSystem.exists('assets/data/${meta.songName}/${meta.songName}-easy.json'))
 					diffsThatExist.push("Easy");
 				if (FileSystem.exists('assets/data/${meta.songName}/${meta.songName}.json'))
 					diffsThatExist.push("Normal");
+				if (FileSystem.exists('assets/data/${meta.songName}/${meta.songName}-hard.json'))
+					diffsThatExist.push("Hard");
 				if (diffsThatExist.length == 0)
 				{
 					Application.current.window.alert("No difficulties found for chart, skipping.",meta.songName + " Chart");
@@ -132,7 +139,7 @@ class FreeplayState extends MusicBeatState
 				weekSongsShit.push(meta);
 			}
 			
-			weeks.push(new WeekMetadata(weekData[0], Std.parseInt(weekData[1]), songsData[0].split("=")[1], weekSongsShit));
+			weeks.push(new WeekMetadata(weekData.weekName, Std.parseInt(weekData.week.substring(weekData.week.length-1)), weekData.songs[0].character, weekSongsShit));
 		}
 
 		 #if windows
@@ -193,13 +200,19 @@ class FreeplayState extends MusicBeatState
 		scoreText.setFormat(Paths.font("vcr.ttf"), 32, FlxColor.WHITE, RIGHT);
 		// scoreText.alignment = RIGHT;
 
-		scoreBG = new FlxSprite(scoreText.x - 6, 0).makeGraphic(Std.int(FlxG.width * 0.35), 66, FlxColor.BLACK);
+		scoreBG = new FlxSprite(scoreText.x - 6, 0).makeGraphic(Std.int(FlxG.width * 0.35), 115, FlxColor.BLACK);
 		scoreBG.alpha = 0.6;
 		add(scoreBG);
 
 		diffText = new FlxText(scoreText.x, scoreText.y + 36, 0, "", 24);
+		diffText.alignment = CENTER;
 		diffText.font = scoreText.font;
+		diffText.x = scoreBG.getGraphicMidpoint().x;
 		add(diffText);
+
+		authorTxt = new FlxText(scoreText.x, scoreText.y + 60, "", 24);
+		authorTxt.font = scoreText.font;
+		add(authorTxt);
 
 		add(scoreText);	
 
@@ -226,72 +239,20 @@ class FreeplayState extends MusicBeatState
 		weeks.push(new FreeplayState.WeekMetadata(weekName, weekNum, songs[0].songCharacter, songs));		
 
 	static var instPlaying:String = '';
-	
-	override function update(elapsed:Float)
-	{
-		super.update(elapsed);
 
-		if (FlxG.sound.music.volume < 0.7)
-			FlxG.sound.music.volume += 0.5 * FlxG.elapsed;
+	override function keyDown(event:KeyboardEvent) {
 
-		if (FlxG.sound.music != null)
-			Conductor.songPosition = FlxG.sound.music.time;
-
-		lerpScore = Math.floor(FlxMath.lerp(lerpScore, intendedScore, CoolUtil.lerpShit(elapsed, 24)));
-
-		if (Math.abs(lerpScore - intendedScore) <= 10)
-			lerpScore = intendedScore;
-
-		scoreText.text = "PERSONAL BEST:" + lerpScore;
-
-		if (FlxG.sound.music.volume > 0.8)
-		{
-			FlxG.sound.music.volume -= 0.5 * FlxG.elapsed;
-		}
-
-		var curIcon = grpIcons.members[(isWeek ? curWeekSelected : curSongSelected)];
-		curIcon.scale.x = curIcon.scale.y = FlxMath.lerp(curIcon.scale.x, 1, CoolUtil.lerpShit(elapsed, 9.8));
-
-		bg.scale.x = bg.scale.y = FlxMath.lerp(bg.scale.x, 1, CoolUtil.lerpShit(elapsed, 9.8));
-
-		var upP = FlxG.keys.justPressed.UP;
-		var downP = FlxG.keys.justPressed.DOWN;
-		var accepted = FlxG.keys.justPressed.ENTER;
-
-		var gamepad:FlxGamepad = FlxG.gamepads.lastActive;
-
-		if (gamepad != null)
-		{
-
-			if (gamepad.justPressed.DPAD_UP)
-			{
-				changeSelection(-1);
-			}
-			if (gamepad.justPressed.DPAD_DOWN)
-			{
-				changeSelection(1);
-			}
-			if (gamepad.justPressed.DPAD_LEFT)
-			{
-				changeDiff(-1);
-			}
-			if (gamepad.justPressed.DPAD_RIGHT)
-			{
-				changeDiff(1);
-			}
-		}
-
-		if (upP)
+		if (event.keyCode == Keyboard.UP)
 			changeSelection(-1);
-		if (downP)
+		if (event.keyCode == Keyboard.DOWN)
 			changeSelection(1);
 
-		if (FlxG.keys.justPressed.LEFT)
+		if (event.keyCode == Keyboard.LEFT)
 			changeDiff(-1);
-		if (FlxG.keys.justPressed.RIGHT)
+		if (event.keyCode == Keyboard.RIGHT)
 			changeDiff(1);
 
-		if (controls.BACK)
+		if (event.keyCode == Keyboard.ESCAPE)
 		{
 			if (colorTween != null)
 				colorTween.cancel();
@@ -319,7 +280,7 @@ class FreeplayState extends MusicBeatState
 				FlxG.switchState(new MainMenuState());
 		}
 
-		if (accepted)
+		if (event.keyCode == Keyboard.ENTER)
 		{
 			if (colorTween != null)
 				colorTween.cancel();
@@ -356,16 +317,16 @@ class FreeplayState extends MusicBeatState
 			}
 		}
 
-		if(FlxG.keys.justPressed.SPACE)
+		if(event.keyCode == Keyboard.SPACE)
 		{
 			#if PRELOAD_ALL
 			if(instPlaying != weeks[curWeekSelected].songs[curSongSelected].songName.toLowerCase() && !isWeek)
 			{
 				var diffs = songData.get(weeks[curWeekSelected].songs[curSongSelected].songName);
 				var song = diffs[curDifficulty];
-				if (diffs.length - 1 < curDifficulty)
-					song = diffs[diffs.length - 1]; //whatever
-
+				if (diffs.length != 3)
+					song = diffs[0]; //whatever
+	
 				if (song != null)
 				{
 					Conductor.changeBPM(song.bpm);
@@ -381,16 +342,16 @@ class FreeplayState extends MusicBeatState
 					});
 					return;
 				}
-
+	
 				PlayState.SONG = song;
-
+	
 				FlxG.sound.music.volume = 0;
 	
 				instPlaying = weeks[curWeekSelected].songs[curSongSelected].songName.toLowerCase();
 	
 				text.text = 'Playing ' + weeks[curWeekSelected].songs[curSongSelected].songName + '!';
 				#if windows
-				DiscordClient.changePresence("In the Freeplay Menu", "Listening to " + weeks[curWeekSelected].songs[curSongSelected].songName);
+				DiscordClient.changePresence("In the Freeplay Menu", "Listening to " + weeks[curWeekSelected].songs[curSongSelected].songName + " - By: " + weeks[curWeekSelected].songs[curSongSelected].songAuthor);
 				#end
 				new FlxTimer().start(1, tmr ->
 				{
@@ -408,29 +369,91 @@ class FreeplayState extends MusicBeatState
 			}
 			#end
 		}
+
+		super.keyUp(event);
 	}
-    
-	var diffs = ["Easy", "Normal", "Hard"];
+	
+	override function update(elapsed:Float)
+	{
+		super.update(elapsed);
+
+		if (FlxG.sound.music != null)
+		{
+			if (FlxG.sound.music.volume < 0.7)
+				FlxG.sound.music.volume += 0.5 * FlxG.elapsed;
+
+			Conductor.songPosition = FlxG.sound.music.time;
+
+			if (FlxG.sound.music.volume > 0.8)
+				FlxG.sound.music.volume -= 0.5 * FlxG.elapsed;
+		} else instPlaying = "";
+
+		lerpScore = Math.floor(FlxMath.lerp(lerpScore, intendedScore, CoolUtil.lerpShit(elapsed, 24)));
+
+		if (Math.abs(lerpScore - intendedScore) <= 10)
+			lerpScore = intendedScore;
+
+		var curIcon = grpIcons.members[(isWeek ? curWeekSelected : curSongSelected)];
+		curIcon.scale.x = curIcon.scale.y = FlxMath.lerp(curIcon.scale.x, 1, CoolUtil.lerpShit(elapsed, 9.8));
+
+		bg.scale.x = bg.scale.y = FlxMath.lerp(bg.scale.x, 1, CoolUtil.lerpShit(elapsed, 9.8));
+
+		var gamepad:FlxGamepad = FlxG.gamepads.lastActive;
+
+		if (gamepad != null)
+		{
+
+			if (gamepad.justPressed.DPAD_UP)
+			{
+				changeSelection(-1);
+			}
+			if (gamepad.justPressed.DPAD_DOWN)
+			{
+				changeSelection(1);
+			}
+			if (gamepad.justPressed.DPAD_LEFT)
+			{
+				changeDiff(-1);
+			}
+			if (gamepad.justPressed.DPAD_RIGHT)
+			{
+				changeDiff(1);
+			}
+		}
+
+		//sorry for this mess (looks very nice visually tho fr)
+		// i might lerp it idk
+		scoreText.text = "PERSONAL BEST:"  + lerpScore;
+		scoreText.x = FlxG.width - scoreText.width - 5;
+		authorTxt.x = FlxG.width - authorTxt.width - 5;
+
+		scoreBG.width = (scoreText.width > authorTxt.width ? scoreText.width + 10 : authorTxt.width + 10);
+		scoreBG.x = (scoreText.x < authorTxt.x ? scoreText.x : authorTxt.x);
+
+		diffText.x = scoreBG.x + (scoreBG.width / 2) - (diffText.width / 2);
+		authorTxt.x = scoreBG.x + (scoreBG.width / 2) - (authorTxt.width / 2);
+	}
+
 	function changeDiff(change:Int = 0)
 	{
 		if (isWeek) return;
 
-		if (!weeks[curWeekSelected].songs[curSongSelected].diffs.contains(diffs[curDifficulty + change]))
-			return;
+		var songDiffs = weeks[curWeekSelected].songs[curSongSelected].diffs;
 
+		//if (/*!["Easy","Normal","Hard"].contains(songDiffs[curDifficulty + change]) || */songDiffs[curDifficulty + change].toLowerCase() == "undefined")return;
+		
 		curDifficulty += change;
 
-		var diffLen = weeks[curWeekSelected].songs[curSongSelected].diffs.length;
 		if (curDifficulty < 0)
-			curDifficulty = diffLen - 1;
-		if (curDifficulty > diffLen)
+			curDifficulty = songDiffs.length - 1;
+		if (curDifficulty > songDiffs.length - 1)
 			curDifficulty = 0;
 		
 		#if !switch
 		intendedScore = Highscore.getScore(weeks[curWeekSelected].songs[curSongSelected].songName, curDifficulty);
 		#end
 
-		diffText.text = diffs[curDifficulty].toUpperCase();
+		diffText.text = "< " + songDiffs[curDifficulty].toUpperCase() + " >";
 	}
 
 	function changeSelection(change:Int = 0)
@@ -451,6 +474,8 @@ class FreeplayState extends MusicBeatState
 				curSongSelected = weeks[curWeekSelected].songs.length - 1;
 			if (curSongSelected >= weeks[curWeekSelected].songs.length)
 				curSongSelected = 0;
+
+			changeDiff();
 		}		
 
 		if (weeks[curWeekSelected].songs[curSongSelected].diffs.length != 3)
@@ -465,10 +490,13 @@ class FreeplayState extends MusicBeatState
 					curDifficulty = 2;
 			}
 		}
+
+		authorTxt.text = "By: " + weeks[curWeekSelected].songs[curSongSelected].songAuthor;
 		
 		scoreBG.visible = !isWeek;
 		scoreText.visible = !isWeek;
 		diffText.visible = !isWeek;
+		authorTxt.visible = !isWeek;
 		#if PRELOAD_ALL
 		text.visible = !isWeek;
 		textBG.visible = !isWeek;
@@ -497,20 +525,20 @@ class FreeplayState extends MusicBeatState
 		
 		if(OptionsMenu.options.flashing){
 			//uh??
-			var colorSheet:Array<String> = CoolUtil.coolTextFile(Paths.txt('data/iconColor'));		
-			for (data in colorSheet)
-			{
-				var colorData:Array<String> = data.split(':');
-    			if(colorData[0] == (isWeek ? weeks[curWeekSelected].weekCharacter : weeks[curWeekSelected].songs[curSongSelected].songCharacter))
-					iconColor = colorData[1];
-			}
+			var data:CharacterData;
+			if (Assets.exists(Paths.json('characters/' + weeks[curWeekSelected].weekCharacter)))
+				data = Json.parse(Assets.getText(Paths.json('characters/' + weeks[curWeekSelected].weekCharacter)));
+			else 
+				data = Json.parse(Assets.getText(Paths.json('characters/dad'))); //awawawa
 
-			if (bg.color != FlxColor.fromString("#FF" + iconColor))
+			iconColor = data.icon.color;
+
+			if (bg.color != FlxColor.fromString(iconColor))
 			{
 				if (colorTween != null)
 					colorTween.cancel();
 
-				colorTween = FlxTween.color(bg, 1, bg.color, FlxColor.fromString("#FF" + iconColor), {ease: FlxEase.sineInOut,
+				colorTween = FlxTween.color(bg, 1, bg.color, FlxColor.fromString(iconColor), {ease: FlxEase.sineInOut,
 					onComplete: twn -> {
 						colorTween = null;
 					} 
@@ -524,26 +552,26 @@ class FreeplayState extends MusicBeatState
 	{
 		super.beatHit();
 
-		var zoomShit:Float = 0;
+		var zoomShit:Float = 1.04;
 
 		//add your song here if you want them to have extra zoom on beat
-		switch(weeks[curWeekSelected].songs[curSongSelected].songName.toLowerCase()){
-			case 'milf':
-				zoomShit = 0.08;
-			default:
-				zoomShit = 0.04;
-		}
+		if (['milf'].contains(instPlaying.toLowerCase()))
+			zoomShit = 1.08;
+
 		var curIcon = grpIcons.members[(isWeek ? curWeekSelected :curSongSelected)];
 		curIcon.scale.x = curIcon.scale.y = 1.24;
 
 		if (OptionsMenu.options.cameraZoom) //not zoom but anyway
-		{
-			bg.scale.x += zoomShit;
-			bg.scale.y += zoomShit;
-		}	
+			bg.scale.x = bg.scale.y = zoomShit;
 
 		if (PlayState.SONG.notes[Math.floor(curStep / 16)] != null && PlayState.SONG.notes[Math.floor(curStep / 16)].changeBPM)
 			Conductor.changeBPM(PlayState.SONG.notes[Math.floor(curStep / 16)].bpm);
+	}
+
+	override function destroy() {
+		super.destroy();
+
+		FlxG.sound.destroy(true);
 	}
 }
 
@@ -567,12 +595,14 @@ class FreeplaySongMetadata
 {
 	public var songName:String = "";
 	public var songCharacter:String = "";
+	public var songAuthor:String = "";
 
 	public var diffs = [];
 
-	public function new(song:String, songCharacter:String)
+	public function new(song:String, songCharacter:String, songAuthor:String)
 	{
 		this.songName = song;
 		this.songCharacter = songCharacter;
+		this.songAuthor = songAuthor;
 	}
 }

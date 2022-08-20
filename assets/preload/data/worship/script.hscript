@@ -1,5 +1,6 @@
 //THIS IS AN EXAMPLE SCRIPT
 //ALL THE EXISTING FUNCTIONS WILL BE HERE JUST TO SHOW IT OR SOMETHING
+//scroll all the way down to see all the imported classes!!
 
 function create()
 {
@@ -11,22 +12,22 @@ function createPost()
     //runs and the end of create
 }
 
-function onStartCountDown()
+function startCountdown()
 {
     //runs when the countdown started
 }
 
-function onCountDown(swagCounter)
+function countdown(swagCounter)
 {
     //runs each time the countdown goes down
 }
 
-function onStartSong()
+function startSong()
 {
     //runs when the song starts duh
 }
 
-function onSongGenerated()
+function generateSong()
 {
     //runs when the notes and music are generated
 }
@@ -56,32 +57,32 @@ function endSong()
     //runs when the song ends of course,
 }
 
-function onDestroy()
+function destroy()
 {
     //runs when you exit playstate
 }
 
-function onKeyPressed(event)
+function keyPress(event)
 {
     //runs every time you press a key, using keyboardevent
 }
 
-function onKeyReleased()
+function keyRelease(event)
 {
     //runs every time you release a key, using keyboardevent
 }
 
-function noteMiss()
+function noteMiss(direction)
 {
     //runs every time you miss a note
 }
 
-function goodNoteHit()
+function goodNoteHit(note)
 {
     //runs every time you hit a note doesnt matter the rating
 }
 
-function opponentNoteHit()
+function opponentNoteHit(note)
 {
     //runs every time the opponent hits a note
 }
@@ -95,3 +96,48 @@ function beatHit()
 {
     //runs every beat
 }
+
+//you can access any PUBLIC STATIC variables/functions from these
+//to access a PUBLIC var/func you would need an instance thingy
+//if the new function isnt private then u should be able to create an "instance" ig
+//so you could access those!!!
+
+CoolUtil;
+PlayState;
+Paths;
+Alphabet;
+Character;
+Conductor;
+Discord;
+Note;
+Song; //Song.hx NOT PlayState.SONG
+Math;
+Application;
+Keyboard;
+Std;
+Options;
+
+Lib;
+sys.FileSystem;
+sys.io.File;
+sys.net.Host;
+System;
+Assets;
+Array;
+DateTools;
+Sys;
+Xml;
+Json;
+Http;
+Serializer;
+Unserializer;
+
+FlxG;
+FlxSprite;
+FlxObject;
+FlxMath;
+FlxText;
+FlxSound;
+FlxTween;
+FlxEase;
+FlxTimer;

@@ -19,32 +19,12 @@ class Caching extends MusicBeatState
 	
 	override function create() 
 	{
-		FlxG.save.bind('funkin', 'ninjamuffin99');
-    
-		Highscore.load();
-		PlayerSettings.init();
-		OptionsData.init();
-        OptionsMenu.loadSettings();
-        KeyBinds.loadKeybinds();
-
-        if (FlxG.save.data.volume != null)
-			FlxG.sound.volume = Std.parseFloat(FlxG.save.data.volume);
-
-	    FlxG.mouse.visible = false;
-		FlxG.worldBounds.set(0,0);
-		FlxG.game.focusLostFramerate = 60;
-		FlxG.autoPause = false;
-
-		DiscordClient.initialize();
-
 		logo = new FlxSprite(FlxG.width / 2, FlxG.height / 2).loadGraphic(Paths.image('preloaderArt'));
 		logo.setGraphicSize(Std.int(logo.width * 0.3));		
 		logo.antialiasing = OptionsMenu.options.antialiasing;
 		add(logo);
-		trace(logo);
-		trace(Paths.image('preloaderArt'));
 
-		#if cpp
+		#if (cpp && PRELOAD_ALL)
 		Thread.create(() -> {
 			preload();
 		});

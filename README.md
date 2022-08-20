@@ -1,3 +1,29 @@
+# Kannadian Engine
+
+This is just a basic engine that I'm making, once I think it has enough features to be properly used, I will make a release
+
+Some features:
+
+- Options Menu
+- - DownScroll
+- - MiddleScroll
+- - Rating pop up
+- - Ghost Tapping
+- - Key Bindings (gameplay only)
+- - Reset button
+- - Song Position
+- - Simple accuracy
+- - Flashing lights (not done)
+- - Antialiasing
+- - Camera Zoom
+- Caching (needs to be better)
+- Some changed menus with small visual effects
+- Better input
+- Softcoded characters (menu is a wip)
+- Softcoded weeks (menu is a wip)
+- A basic error handler
+- Chart with your keybinds in charting menu (subject to change)
+
 # Friday Night Funkin
 
 This is the repository for Friday Night Funkin, a game originally made for Ludum Dare 47 "Stuck In a Loop".
@@ -10,7 +36,7 @@ IF YOU MAKE A MOD AND DISTRIBUTE A MODIFIED / RECOMPILED VERSION, YOU MUST OPEN 
 
 ## Credits / shoutouts
 
-- [ninjamuffin99 (me!)](https://twitter.com/ninja_muffin99) - Programmer
+- [ninjamuffin99](https://twitter.com/ninja_muffin99) - Programmer
 - [PhantomArcade3K](https://twitter.com/phantomarcade3k) and [Evilsk8r](https://twitter.com/evilsk8r) - Art
 - [Kawaisprite](https://twitter.com/kawaisprite) - Musician
 

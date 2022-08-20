@@ -165,6 +165,9 @@
 	<icon path="art/icon64.png" size='64'/>
 	<icon path="art/iconOG.png" />
 
+	<!-- this is for crash handler shit, made it only trigger in release -->
+	<haxedef name="HXCPP_CHECK_POINTER" unless="debug"/>
+	<haxedef name="HXCPP_STACK_LINE" unless="debug"/>
 
 	<!-- <haxedef name="SKIP_TO_PLAYSTATE" if="debug" /> -->
 	

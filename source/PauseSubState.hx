@@ -19,7 +19,7 @@ class PauseSubState extends MusicBeatSubstate
 {
 	var grpMenuShit:FlxTypedGroup<Alphabet>;
 
-	var menuItems:Array<String> = ['Resume', 'Restart Song', 'Exit to menu'];
+	var menuItems:Array<String> = ['Resume', 'Restart Song', 'Options', 'Exit to menu'];
 	var curSelected:Int = 0;
 
 	var pauseMusic:FlxSound;
@@ -109,13 +109,17 @@ class PauseSubState extends MusicBeatSubstate
 					close();
 					var diff = "";
 					switch (PlayState.storyDifficulty) {case 0: diff = "Easy"; case 1: diff = "Normal"; case 2: diff = "Hard";}
-					Lib.application.window.title = Application.current.meta.get("name") + " - " + PlayState.SONG.song + " (" + diff + ")";
+					var author = FreeplayState.weeks[FreeplayState.curWeekSelected].songs[FreeplayState.curSongSelected].songAuthor;
+					Lib.application.window.title = Application.current.meta.get("name") + " - " + PlayState.SONG.song + " (" + diff +") | By: " + author;
 				case "Restart Song":
 					FlxG.resetState();
+				case "Options":
+					openSubState(new OptionsSubState());
 				case "Exit to menu":
 					FlxG.switchState((PlayState.isStoryMode ? new StoryMenuState() : new FreeplayState()));
 					Lib.application.window.title = Application.current.meta.get("name");
 			}
+			
 		}
 	}
 

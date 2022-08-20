@@ -1,5 +1,7 @@
 package;
 
+import openfl.ui.Keyboard;
+import openfl.events.KeyboardEvent;
 import flixel.math.FlxMath;
 import flixel.tweens.FlxTween;
 import flixel.tweens.FlxEase;
@@ -26,6 +28,7 @@ typedef Options =
 class OptionsMenu extends MusicBeatState
 {
 	public static var options:Options;
+	public static var inKeyBindsMenu:Bool = false;
 	static var curCatSelected:Int = 0;
 	static var curOptSelected:Int = 0;
 	var grpOptions:FlxTypedGroup<Alphabet>;
@@ -88,13 +91,17 @@ class OptionsMenu extends MusicBeatState
 			Conductor.songPosition = FlxG.sound.music.time;
 
 		bg.scale.x = bg.scale.y = FlxMath.lerp(bg.scale.x, 1, CoolUtil.lerpShit(elapsed, 9.8));
+	}
 
-		if (FlxG.keys.justPressed.UP)
+	override function keyDown(event:KeyboardEvent) {
+		if (inKeyBindsMenu) return;
+		
+		if (event.keyCode == Keyboard.UP)
 			changeSelection(-1);
-		if (FlxG.keys.justPressed.DOWN)
+		if (event.keyCode == Keyboard.DOWN)
 			changeSelection(1);
 
-		if (FlxG.keys.justPressed.ENTER)
+		if (event.keyCode == Keyboard.ENTER)
 		{
 			if (!isInOptionCat)
 			{
@@ -151,6 +158,7 @@ class OptionsMenu extends MusicBeatState
 						FlxG.save.data.showRating = optionsMap[curSelectedCatText][grpOptions.members[curOptSelected].text];
 					case "Key Bindings":
 						openSubState(new KeyBinds());
+						inKeyBindsMenu = true;
 					case "Antialiasing":
 						optionsMap[curSelectedCatText][grpOptions.members[curOptSelected].text] = !optionsMap[curSelectedCatText][grpOptions.members[curOptSelected].text];
 						FlxG.save.data.antialiasing = optionsMap[curSelectedCatText][grpOptions.members[curOptSelected].text];
@@ -174,7 +182,7 @@ class OptionsMenu extends MusicBeatState
 			}
 		}
 
-		if (controls.BACK)
+		if (event.keyCode == Keyboard.ESCAPE)
 		{
 			if  (isInOptionCat)
 			{
@@ -200,6 +208,8 @@ class OptionsMenu extends MusicBeatState
 				FlxG.switchState(new MainMenuState());
 				
 		}
+
+		super.keyDown(event);
 	}
 
 	function changeSelection(change:Int = 0)

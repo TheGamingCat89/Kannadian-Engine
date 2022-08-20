@@ -55,23 +55,30 @@ class TitleState extends MusicBeatState
 
 	override public function create():Void
 	{
+		//init shit
+		FlxG.save.bind('funkin', 'ninjamuffin99');
+    
+		Highscore.load();
+		PlayerSettings.init();
+		OptionsData.init();
+        OptionsMenu.loadSettings();
+        KeyBinds.loadKeybinds();
+
+        if (FlxG.save.data.volume != null)
+			FlxG.sound.volume = Std.parseFloat(FlxG.save.data.volume);
+
+	    FlxG.mouse.visible = false;
+		FlxG.worldBounds.set(0,0);
+		FlxG.game.focusLostFramerate = 60;
+		FlxG.autoPause = false;
+
+		#if desktop
+		DiscordClient.initialize();
+		#end
+
 		curWacky = FlxG.random.getObject(getIntroTextShit());
 
 		super.create();
-
-		if (FlxG.save.data.weekUnlocked != null)
-		{
-			// FIX LATER!!!
-			// WEEK UNLOCK PROGRESSION!!
-			// StoryMenuState.weekUnlocked = FlxG.save.data.weekUnlocked;
-
-			if (StoryMenuState.weekUnlocked.length < 4)
-				StoryMenuState.weekUnlocked.insert(0, true);
-
-			// QUICK PATCH OOPS!
-			if (!StoryMenuState.weekUnlocked[0])
-				StoryMenuState.weekUnlocked[0] = true;
-		}
 
 		#if FREEPLAY
 		FlxG.switchState(new FreeplayState());

@@ -1,0 +1,58 @@
+{
+    "week":"week7",
+    "weekName":"songs i like or something idk",
+    "menuCharacters":["dad", "bf", "gf"],
+    "weekUnlocked": true,
+    "songs":[
+        {
+            "name":"Worship",
+            "character":"dad",
+            "author":"Mike Geno"
+        },
+        {
+            "name":"Zavodila",
+            "character":"dad",
+            "author":"Mike Geno"
+        },
+        {
+            "name":"Lockdown",
+            "character":"dad",
+            "author":"Aika"
+        },
+        {
+            "name":"Quasar",
+            "character":"dad",
+            "author":"Aika"
+        },
+        {
+            "name":"Hairball",
+            "character":"dad",
+            "author":"Mike Geno"
+        },
+        {
+            "name":"Quaoar",
+            "character":"dad",
+            "author":"Camellia"
+        },
+        {
+            "name":"Snake Eyes",
+            "character":"dad",
+            "author":"Mike Geno"
+        },
+        {
+            "name":"Devils Gambit",
+            "character":"dad",
+            "author":"TheInnuend0 & Saruky"
+        },
+        {
+            "name":"everything i wanted",
+            "character":"mom",
+            "author":"Billie Eilish"
+        },
+        {
+            "name":"Happier Than Ever",
+            "character":"mom",
+            "author":"Billie Eilish"
+        }
+    ]
+}

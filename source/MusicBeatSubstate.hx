@@ -1,5 +1,6 @@
 package;
 
+import openfl.events.KeyboardEvent;
 import Conductor.BPMChangeEvent;
 import flixel.FlxG;
 import flixel.FlxSubState;
@@ -9,6 +10,9 @@ class MusicBeatSubstate extends FlxSubState
 	public function new()
 	{
 		super();
+
+		FlxG.stage.addEventListener(KeyboardEvent.KEY_DOWN, keyDown);
+		FlxG.stage.addEventListener(KeyboardEvent.KEY_UP, keyUp);
 	}
 
 	private var lastBeat:Float = 0;
@@ -20,6 +24,17 @@ class MusicBeatSubstate extends FlxSubState
 
 	inline function get_controls():Controls
 		return PlayerSettings.player1.controls;
+
+	override function destroy()
+	{
+		FlxG.stage.removeEventListener(KeyboardEvent.KEY_DOWN, keyDown);
+		FlxG.stage.removeEventListener(KeyboardEvent.KEY_UP, keyUp);
+		super.destroy();
+	}
+
+	private function keyDown(event:KeyboardEvent) {}
+
+	private function keyUp(event:KeyboardEvent) {}
 
 	override function update(elapsed:Float)
 	{

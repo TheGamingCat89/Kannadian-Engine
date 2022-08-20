@@ -1,5 +1,8 @@
 package;
 
+import flixel.util.FlxColor;
+import openfl.ui.Keyboard;
+import openfl.events.KeyboardEvent;
 import Controls.Control;
 import flixel.util.FlxTimer;
 import flixel.FlxSprite;
@@ -20,9 +23,8 @@ class KeyBinds extends MusicBeatSubstate
     var curSelected:Int;
     
     var text:FlxText;
-    static public var keybinds:Map<String, Array<FlxKey>>;
-    var e:Array<FlxKey> = [27, 20, 13, 18, 8];
-    var lastPressed:FlxKey = -1;
+    static public var keybinds:Array<Array<Dynamic>> = [];
+    var e:Array<Int> = [27, 20, 13, 18, 8];
 
     override function create() {
 
@@ -35,20 +37,20 @@ class KeyBinds extends MusicBeatSubstate
         grpKeybinds = new FlxTypedGroup<Alphabet>();
         add(grpKeybinds);
 
-        var i = 0; // no count variable waa
-        for (key => value in keybinds)
+        for (i => value in keybinds)
         {
-            var thing = new Alphabet(0,0, key + " keybind - " + value[0].toString(), true);
+            var thing = new Alphabet(0,0, value[0] + " keybind - " + cast(value[1][0], FlxKey).toString(), true); 
             thing.isMenuItem = true;
             thing.targetY = i;
             grpKeybinds.add(thing);
-
-            i++;
         }
 
-        text = new FlxText(FlxG.width/2, 100, 0, "PRESS ANY KEY", 32);
+        text = new FlxText(0, 100, 0, "PRESS ANY KEY");
+        text.setFormat(Paths.font("vcr.ttf"), 32, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE);
         text.visible = false;
         add(text);
+
+        text.screenCenter(X);
 
         super.create();
     }
@@ -56,52 +58,51 @@ class KeyBinds extends MusicBeatSubstate
     public function new() {
         super();      
     }
-    
+
     var settingKeybind = false;
 
-    override function update(elapsed:Float) {
-        super.update(elapsed);
-
-        if (FlxG.keys.justPressed.UP)
+    override function keyDown(event:KeyboardEvent)
+    {
+        if (event.keyCode == Keyboard.UP)
             changeSelection(-1);
-        if (FlxG.keys.justPressed.DOWN)
+        if (event.keyCode == Keyboard.DOWN)
             changeSelection(1);
 
-        if (FlxG.keys.justPressed.ESCAPE)
+        if (event.keyCode == Keyboard.ESCAPE)
         {
             FlxG.sound.play(Paths.sound('cancelMenu'));
             if (settingKeybind)
                 settingKeybind = text.visible = false;
             else
+            {
                 close();
+                OptionsMenu.inKeyBindsMenu = false;
+            }
         }
 
-        if(FlxG.keys.justPressed.ENTER)
+        var curKey:FlxKey = keybinds[curSelected][1][0];
+
+        if(event.keyCode == Keyboard.ENTER)
             text.visible = settingKeybind = true;
 
-        if(settingKeybind && FlxG.keys.justPressed.ANY && !FlxG.keys.anyJustPressed(e))
+        if(settingKeybind && !e.contains(event.keyCode))
         {
             FlxG.sound.play(Paths.sound('confirmMenu'));
 
-            trace(grpKeybinds.members[curSelected].text.split(" ")[0] + ": " + keybinds[grpKeybinds.members[curSelected].text.split(" ")[0]][0]);
-            keybinds[grpKeybinds.members[curSelected].text.split(" ")[0]][0] = FlxG.keys.firstJustPressed();
-            lastPressed = -1;
-            trace(grpKeybinds.members[curSelected].text.split(" ")[0] + ": " + keybinds[grpKeybinds.members[curSelected].text.split(" ")[0]][0]);
+            trace(keybinds[curSelected][0] + ": " +  curKey);
 
-            //IHATE THAT I HAVE TO DO THIS IM SORRY
-            switch (grpKeybinds.members[curSelected].text.split(" ")[0])
-            {
-                //PLEASE WORK
-                case "left":
-                    FlxG.save.data.leftBind = keybinds[grpKeybinds.members[curSelected].text.split(" ")[0]][0].toString();
-                case "down":
-                    FlxG.save.data.downBind = keybinds[grpKeybinds.members[curSelected].text.split(" ")[0]][0].toString();
-                case "up":
-                    FlxG.save.data.upBind = keybinds[grpKeybinds.members[curSelected].text.split(" ")[0]][0].toString();
-                case "right":
-                    FlxG.save.data.rightBind = keybinds[grpKeybinds.members[curSelected].text.split(" ")[0]][0].toString();
-            }
-            grpKeybinds.members[curSelected].changeText(grpKeybinds.members[curSelected].text.split(" ")[0] + " keybind - " + keybinds[grpKeybinds.members[curSelected].text.split(" ")[0]][0].toString());
+            keybinds[curSelected][1][0] = event.keyCode;
+
+            curKey = keybinds[curSelected][1][0];
+
+            trace(keybinds[curSelected][0] + ": " +  curKey);
+
+            //thoguht of something
+            trace(keybinds[curSelected][0] + "Bind: " + Reflect.getProperty(FlxG.save.data, keybinds[curSelected][0] + "Bind"));
+            Reflect.setProperty(FlxG.save.data, keybinds[curSelected][0] + "Bind",  curKey.toString());
+            trace(keybinds[curSelected][0] + "Bind: " + Reflect.getProperty(FlxG.save.data, keybinds[curSelected][0] + "Bind"));
+
+            grpKeybinds.members[curSelected].changeText(keybinds[curSelected][0] + " keybind - " +  curKey.toString());
             FlxG.save.flush();
             settingKeybind = text.visible = false;
         }
@@ -133,10 +134,10 @@ class KeyBinds extends MusicBeatSubstate
     public static function loadKeybinds()
     {
         keybinds = [
-            "left" =>   [FlxKey.fromString(FlxG.save.data.leftBind), LEFT],
-            "down" =>   [FlxKey.fromString(FlxG.save.data.downBind), DOWN],
-            "up" =>     [FlxKey.fromString(FlxG.save.data.upBind), UP],
-            "right" =>  [FlxKey.fromString(FlxG.save.data.rightBind), RIGHT]
+            ["left", [FlxKey.fromString(FlxG.save.data.leftBind), LEFT]],
+            ["down", [FlxKey.fromString(FlxG.save.data.downBind), DOWN]],
+            ["up", [FlxKey.fromString(FlxG.save.data.upBind), UP]],
+            ["right", [FlxKey.fromString(FlxG.save.data.rightBind), RIGHT]]
         ];
     }
 }

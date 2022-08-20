@@ -1,5 +1,7 @@
 package;
 
+import openfl.ui.Keyboard;
+import openfl.events.KeyboardEvent;
 import flixel.addons.ui.FlxUI;
 import flixel.ui.FlxBar;
 #if sys
@@ -26,10 +28,7 @@ import flixel.addons.ui.FlxUITabMenu;
 //!!!I AM NOT DONE WITH THIS SO EXPECT IT TO CRASH LOL (ill fix it sometime soon i hope)!!!
 class AnimationDebug extends MusicBeatState
 {
-	var bf:Boyfriend;
-	var dad:Character;
-	var char:Character;
-	var TEST:FlxSprite;
+	var character:Character;
 	var icon:HealthIcon;
 	var textAnim:FlxText;
 	var dumbTexts:FlxTypedGroup<FlxText>;
@@ -50,7 +49,6 @@ class AnimationDebug extends MusicBeatState
 	override function create()
 	{
 		FlxG.mouse.visible = true;
-		FlxG.sound.music.stop();
 
 		#if sys if (FileSystem.exists(Paths.json("characters/" + daAnim))) #end
 			charData = Json.parse(Assets.getText(Paths.json("characters/" + daAnim)));
@@ -96,7 +94,7 @@ class AnimationDebug extends MusicBeatState
 						looped: false
 					},
 				],
-				path: "",
+				path: "DADDY_DEAREST",
 				icon: {
 					icon: "dad",
 					color: "#FFaf66ce"
@@ -110,8 +108,13 @@ class AnimationDebug extends MusicBeatState
 		gridBG.scrollFactor.set(0.5, 0.5);
 		add(gridBG);
 
-		#if sys if (FileSystem.exists(Paths.image('characters/' + daAnim, 'shared')) && FileSystem.exists(Paths.xml('characters/' + daAnim, 'shared'))) #end
-			TEST.frames = Paths.getSparrowAtlas('characters/' + daAnim, 'shared');
+		character = new Character(0,0, daAnim);
+		character.screenCenter();
+		character.debugMode = true;
+	
+		character.antialiasing = charData.antialiasing;
+		character.flipX = charData.flipped;
+
 		/*if (daAnim == 'bf')
 			isDad = false;
 
@@ -143,7 +146,8 @@ class AnimationDebug extends MusicBeatState
 		];
 
 		menu = new FlxUITabMenu(null, tabs, true);	
-		menu.resize(300, 400);
+		menu.scrollFactor.set();
+		menu.resize(200, 200);
 		menu.x = FlxG.width / 4;
 		menu.y = 20;
 		add(menu);
@@ -157,7 +161,7 @@ class AnimationDebug extends MusicBeatState
 
 		var healthBar = new FlxBar(healthBarBG.x + 4, healthBarBG.y + 4, LEFT_TO_RIGHT, Std.int(healthBarBG.width - 8), Std.int(healthBarBG.height - 8), this, '', 0, 2);
 		healthBar.scrollFactor.set();
-		healthBar.createFilledBar(0xFF00C78B, FlxColor.fromString(charData.icon.color));
+		healthBar.createFilledBar(FlxColor.fromString(charData.icon.color), 0xFF00D19D);
 		add(healthBar);
 
 		icon = new HealthIcon(daAnim);
@@ -183,86 +187,76 @@ class AnimationDebug extends MusicBeatState
 		super.create();
 	}
 
-	override function update(elapsed:Float)
+	override function keyDown(event:KeyboardEvent)
 	{
-		textAnim.text = char.animation.curAnim.name;
-
-		if (FlxG.keys.justPressed.E)
+		if (event.keyCode == Keyboard.E)
 			FlxG.camera.zoom += 0.25;
-		if (FlxG.keys.justPressed.Q)
+		if (event.keyCode == Keyboard.Q)
 			FlxG.camera.zoom -= 0.25;
 
-		if (FlxG.keys.pressed.I || FlxG.keys.pressed.J || FlxG.keys.pressed.K || FlxG.keys.pressed.L)
-		{
-			if (FlxG.keys.pressed.I)
-				camFollow.velocity.y = -90;
-			else if (FlxG.keys.pressed.K)
-				camFollow.velocity.y = 90;
-			else
-				camFollow.velocity.y = 0;
+		if (event.keyCode == Keyboard.I)
+			camFollow.velocity.y = -90;
+		if (event.keyCode == Keyboard.J)
+			camFollow.velocity.x = -90;
+		if (event.keyCode == Keyboard.K)
+			camFollow.velocity.y = 90;
+		if (event.keyCode == Keyboard.L)
+			camFollow.velocity.x = 90;
 
-			if (FlxG.keys.pressed.J)
-				camFollow.velocity.x = -90;
-			else if (FlxG.keys.pressed.L)
-				camFollow.velocity.x = 90;
-			else
-				camFollow.velocity.x = 0;
-		}
-		else
-		{
-			camFollow.velocity.set();
-		}
-
-		if (FlxG.keys.justPressed.W)
-		{
+		if (event.keyCode == Keyboard.W)
 			curAnim -= 1;
-		}
 
-		if (FlxG.keys.justPressed.S)
-		{
+		if (event.keyCode == Keyboard.S)
 			curAnim += 1;
-		}
 
 		if (curAnim < 0)
 			curAnim = charData.animations.length - 1;
-
 		if (curAnim >= charData.animations.length)
 			curAnim = 0;
 
-		if (FlxG.keys.justPressed.S || FlxG.keys.justPressed.W || FlxG.keys.justPressed.SPACE)
+		if (event.keyCode == Keyboard.SPACE || event.keyCode == Keyboard.W || event.keyCode == Keyboard.S)
 		{
-			char.playAnim(charData.animations[curAnim].name);
+			character.playAnim(charData.animations[curAnim].name);
 
 			updateTexts();
 			genBoyOffsets();
 		}
 
-		var upP = FlxG.keys.anyJustPressed([UP]);
-		var rightP = FlxG.keys.anyJustPressed([RIGHT]);
-		var downP = FlxG.keys.anyJustPressed([DOWN]);
-		var leftP = FlxG.keys.anyJustPressed([LEFT]);
-
-		var holdShift = FlxG.keys.pressed.SHIFT;
 		var multiplier = 1;
-		if (holdShift)
+		if (event.shiftKey)
 			multiplier = 10;
 
-		if (upP || rightP || downP || leftP)
+		if (event.keyCode == Keyboard.UP || event.keyCode == Keyboard.RIGHT || event.keyCode == Keyboard.DOWN || event.keyCode == Keyboard.LEFT)
 		{
 			updateTexts();
-			if (upP)
+
+			if (event.keyCode == Keyboard.UP)
 				charData.animations[curAnim].offset[1] += 1 * multiplier;
-			if (downP)
+			if (event.keyCode == Keyboard.DOWN)
 				charData.animations[curAnim].offset[1] -= 1 * multiplier;
-			if (leftP)
+			if (event.keyCode == Keyboard.LEFT)
 				charData.animations[curAnim].offset[0] += 1 * multiplier;
-			if (rightP)
+			if (event.keyCode == Keyboard.RIGHT)
 				charData.animations[curAnim].offset[0] -= 1 * multiplier;
 
 			updateTexts();
 			genBoyOffsets();
-			char.playAnim(charData.animations[curAnim].name);
+			character.playAnim(charData.animations[curAnim].name);
 		}
+		super.keyDown(event);
+	}
+
+	override function keyUp(event:KeyboardEvent) {
+		super.keyUp(event);
+
+		camFollow.velocity.set();
+	}
+
+	override function update(elapsed:Float)
+	{
+		textAnim.text = character.animation.curAnim.name;
+
+		
 
 		super.update(elapsed);
 	}
@@ -283,7 +277,7 @@ class AnimationDebug extends MusicBeatState
 		var daLoop:Int = 0;
 
 		dumbTexts.clear();
-		for (anim => offsets in char.animOffsets)
+		for (anim => offsets in character.animOffsets)
 		{
 			var text:FlxText = new FlxText(10, 20 + (18 * daLoop), 0, anim + ": " + offsets, 15);
 			text.scrollFactor.set();
@@ -306,9 +300,9 @@ class AnimationDebug extends MusicBeatState
 
 	function updateChar()
 	{
-		if (char.curCharacter != charData.name)
+		if (character.curCharacter != charData.name)
 		{
-			char = new Character(0,0,charData.name);
+			character = new Character(0,0,charData.name);
 			
 			genBoyOffsets();
 		}
@@ -372,6 +366,7 @@ class AnimationDebug extends MusicBeatState
 			if (action == "enter")
 				charData.path = text;
 			updateChar();
+			trace(charData.path);
 		}
 		grp.add(charPath);
 
@@ -409,7 +404,7 @@ class AnimationDebug extends MusicBeatState
 		charAntialiasing.name = "character_antialiasing";
 		charAntialiasing.callback = () -> {
 			charData.antialiasing = charAntialiasing.checked;
-			char.antialiasing = charData.antialiasing;
+			character.antialiasing = charData.antialiasing;
 		}
 		grp.add(charFlipped);
 
