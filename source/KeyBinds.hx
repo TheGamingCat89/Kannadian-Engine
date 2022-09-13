@@ -88,20 +88,12 @@ class KeyBinds extends MusicBeatSubstate
         if(settingKeybind && !e.contains(event.keyCode))
         {
             FlxG.sound.play(Paths.sound('confirmMenu'));
-
             trace(keybinds[curSelected][0] + ": " +  curKey);
-
             keybinds[curSelected][1][0] = event.keyCode;
-
             curKey = keybinds[curSelected][1][0];
 
-            trace(keybinds[curSelected][0] + ": " +  curKey);
-
             //thoguht of something
-            trace(keybinds[curSelected][0] + "Bind: " + Reflect.getProperty(FlxG.save.data, keybinds[curSelected][0] + "Bind"));
             Reflect.setProperty(FlxG.save.data, keybinds[curSelected][0] + "Bind",  curKey.toString());
-            trace(keybinds[curSelected][0] + "Bind: " + Reflect.getProperty(FlxG.save.data, keybinds[curSelected][0] + "Bind"));
-
             grpKeybinds.members[curSelected].changeText(keybinds[curSelected][0] + " keybind - " +  curKey.toString());
             FlxG.save.flush();
             settingKeybind = text.visible = false;

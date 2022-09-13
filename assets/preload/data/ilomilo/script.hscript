@@ -1,0 +1,22 @@
+function createPost()
+    {
+        var firstTween = function()
+        {
+            FlxTween.tween(PlayState.instance.iconP1, {y: PlayState.instance.iconP1.y - 100, angle: -15}, 0.4, {
+                ease: FlxEase.circOut,
+                onComplete: function(twn)
+                {
+                    FlxTween.tween(PlayState.instance.iconP1, {y: originalPos, angle: 15}, 0.4, {
+                        ease: FlxEase.circIn,
+                        onComplete: function(twn)
+                        {
+                            PlayState.instance.iconP1.flipX = !PlayState.instance.iconP1.flipX;
+                            firstTween();
+                        }
+                    });
+                }
+            });
+        }
+    
+        firstTween();
+    }

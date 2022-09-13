@@ -1,3 +1,4 @@
+//credits to EIT#1707 woo
 package;
 
 import flixel.FlxCamera;
@@ -18,9 +19,9 @@ class FlxWindow extends Sprite
 	var inputContainer:Sprite;
 	public static var cameras(default, null):CameraFrontEnd;
 	public var camera:FlxCamera;
+	
 	public function new(x:Int, y:Int, width:Int, height:Int, title:String, frameRate:Int, resizable:Bool, fullscreen:Bool)
 	{
-		trace("created window");
 		super();
 		inputContainer = new Sprite();
 		var attributes:WindowAttributes = {
@@ -44,20 +45,17 @@ class FlxWindow extends Sprite
 			vsync: false
 		};
 		window = FlxG.stage.application.createWindow(attributes);
-		window.stage.color = FlxColor.ORANGE;
+		window.stage.color = FlxColor.BLACK;
 		camera = new FlxCamera(0, 0, width, height);
 
 		if (stage != null)
 			init();
 		else
 			addEventListener(Event.ADDED_TO_STAGE, init);
-		trace("new function done");
 	}
 
 	function init(?_):Void
 	{
-		trace('create called stage=${stage}');
-
 		if (hasEventListener(Event.ADDED_TO_STAGE))
 			removeEventListener(Event.ADDED_TO_STAGE, init);
 		

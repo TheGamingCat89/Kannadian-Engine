@@ -23,6 +23,7 @@ typedef Options =
 	@:optional public var antialiasing:Bool;
 	@:optional public var flashing:Bool;
 	@:optional public var cameraZoom:Bool;
+	@:optional public var botPlay:Bool;
 }
 
 class OptionsMenu extends MusicBeatState
@@ -47,12 +48,12 @@ class OptionsMenu extends MusicBeatState
 			"Reset Button" => FlxG.save.data.resetButton,
 			"Simple Accuracy" => FlxG.save.data.simpleAccuracy,
 			"Show Rating" => FlxG.save.data.showRating,
-			"Key Bindings" => null //uhhh i dont think thats needed
+			"Key Bindings" => null, //uhhh i dont think thats needed
 		],
 		"Appearance" => [
 			"Antialiasing" => FlxG.save.data.antialiasing,
 			"Flashing" => FlxG.save.data.flashing,
-			"Camera zoom" => FlxG.save.data.cameraZoom,
+			"Camera Zoom" => FlxG.save.data.cameraZoom,
 		],
 	];
 	var optionsLength:Int = 0;// .length isnt a thing akjgldvfj;lk
@@ -132,46 +133,30 @@ class OptionsMenu extends MusicBeatState
 			{
 				//im so fucking sorry for this oh my god
 				//ill find a way to optimize it.. i hope
-				//wish FlxG.save.data["thing"] was a Map fr				
-				switch(grpOptions.members[curOptSelected].text)
+				//wish FlxG.save.data["thing"] was a Map fr	
+				//figured out a better way youll have a nicer looking thingy of this soon!!! maybe i hope idk :sob:
+				var text = grpOptions.members[curOptSelected].text;
+				var nonBoolOpt = !(optionsMap[curSelectedCatText][text] is Bool);
+				
+				if (nonBoolOpt)
 				{
-					case "Ghost Tapping":
-						optionsMap[curSelectedCatText][grpOptions.members[curOptSelected].text] = !optionsMap[curSelectedCatText][grpOptions.members[curOptSelected].text];
-						FlxG.save.data.ghostTapping = optionsMap[curSelectedCatText][grpOptions.members[curOptSelected].text];
-					case "Down Scroll":
-						optionsMap[curSelectedCatText][grpOptions.members[curOptSelected].text] = !optionsMap[curSelectedCatText][grpOptions.members[curOptSelected].text];
-						FlxG.save.data.downScroll = optionsMap[curSelectedCatText][grpOptions.members[curOptSelected].text];
-					case "Middle Scroll":
-						optionsMap[curSelectedCatText][grpOptions.members[curOptSelected].text] = !optionsMap[curSelectedCatText][grpOptions.members[curOptSelected].text];
-						FlxG.save.data.middleScroll = optionsMap[curSelectedCatText][grpOptions.members[curOptSelected].text];
-					case "Song Position":
-						optionsMap[curSelectedCatText][grpOptions.members[curOptSelected].text] = !optionsMap[curSelectedCatText][grpOptions.members[curOptSelected].text];
-						FlxG.save.data.songPosition = optionsMap[curSelectedCatText][grpOptions.members[curOptSelected].text];
-					case "Reset Button":
-						optionsMap[curSelectedCatText][grpOptions.members[curOptSelected].text] = !optionsMap[curSelectedCatText][grpOptions.members[curOptSelected].text];
-						FlxG.save.data.resetButton = optionsMap[curSelectedCatText][grpOptions.members[curOptSelected].text];
-					case "Simple Accuracy":
-						optionsMap[curSelectedCatText][grpOptions.members[curOptSelected].text] = !optionsMap[curSelectedCatText][grpOptions.members[curOptSelected].text];
-						FlxG.save.data.simpleAccuracy = optionsMap[curSelectedCatText][grpOptions.members[curOptSelected].text];
-					case "Show Rating":
-						optionsMap[curSelectedCatText][grpOptions.members[curOptSelected].text] = !optionsMap[curSelectedCatText][grpOptions.members[curOptSelected].text];
-						FlxG.save.data.showRating = optionsMap[curSelectedCatText][grpOptions.members[curOptSelected].text];
-					case "Key Bindings":
-						openSubState(new KeyBinds());
-						inKeyBindsMenu = true;
-					case "Antialiasing":
-						optionsMap[curSelectedCatText][grpOptions.members[curOptSelected].text] = !optionsMap[curSelectedCatText][grpOptions.members[curOptSelected].text];
-						FlxG.save.data.antialiasing = optionsMap[curSelectedCatText][grpOptions.members[curOptSelected].text];
-					case "Flashing":
-						optionsMap[curSelectedCatText][grpOptions.members[curOptSelected].text] = !optionsMap[curSelectedCatText][grpOptions.members[curOptSelected].text];
-						FlxG.save.data.flashing = optionsMap[curSelectedCatText][grpOptions.members[curOptSelected].text];
-					case "Camera zoom":
-						optionsMap[curSelectedCatText][grpOptions.members[curOptSelected].text] = !optionsMap[curSelectedCatText][grpOptions.members[curOptSelected].text];
-						FlxG.save.data.cameraZoom = optionsMap[curSelectedCatText][grpOptions.members[curOptSelected].text];
+					switch (text)
+					{
+						case 'Key Bindings':
+							openSubState(new KeyBinds());
+							inKeyBindsMenu = true;
+					}
 				}
+				else
+				{
+					optionsMap[curSelectedCatText][text] = !optionsMap[curSelectedCatText][text];
+					Reflect.setProperty(FlxG.save.data, text.charAt(0).toLowerCase() + text.substring(1,text.length).split(" ").join(""), optionsMap[curSelectedCatText][text]);
+				}
+					
+
 				//hopefully works? dont mind the mess
-				var value = optionsMap[curSelectedCatText][grpOptions.members[curOptSelected].text];
-				if (Std.isOfType(value, Bool))
+				var value = optionsMap[curSelectedCatText][text];
+				if (value is Bool)
 					if(value) grpOptions.members[curOptSelected].color = FlxColor.GREEN;
 					else grpOptions.members[curOptSelected].color = FlxColor.RED;
 				if(value == null)
@@ -179,6 +164,8 @@ class OptionsMenu extends MusicBeatState
 
 				FlxG.save.flush();
 				OptionsMenu.loadSettings();
+
+				
 			}
 		}
 
@@ -268,7 +255,8 @@ class OptionsMenu extends MusicBeatState
 			showRating: FlxG.save.data.showRating,
 			antialiasing: FlxG.save.data.antialiasing,
 			flashing: FlxG.save.data.flashing,
-			cameraZoom: FlxG.save.data.cameraZoom
+			cameraZoom: FlxG.save.data.cameraZoom,
+			botPlay: FlxG.save.data.botPlay
 		}
 	}
 }

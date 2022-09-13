@@ -4,7 +4,7 @@ import openfl.ui.Keyboard;
 import flixel.input.keyboard.FlxKey;
 import openfl.events.KeyboardEvent;
 import openfl.Lib;
-#if desktop
+#if cpp
 import Discord.DiscordClient;
 #end
 import flixel.FlxG;
@@ -39,7 +39,7 @@ class MainMenuState extends MusicBeatState
 
 	override function create()
 	{
-		#if desktop
+		#if cpp
 		// Updating Discord Rich Presence
 		DiscordClient.changePresence("In the Menus", null);
 		#end
@@ -47,7 +47,7 @@ class MainMenuState extends MusicBeatState
 		transIn = FlxTransitionableState.defaultTransIn;
 		transOut = FlxTransitionableState.defaultTransOut;
 
-		if (!FlxG.sound.music.playing)
+		if (FlxG.sound.music == null)
 			FlxG.sound.playMusic(Paths.music('freakyMenu'));
 
 		persistentUpdate = persistentDraw = true;

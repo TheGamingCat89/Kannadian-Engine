@@ -1,16 +1,14 @@
 package;
 
+import haxe.macro.Context;
 #if cpp
 import cpp.Lib;
 #end
-import openfl.system.System;
 import haxe.CallStack;
-import openfl.media.SoundLoaderContext;
-import flixel.addons.display.shapes.FlxShapeDonut;
-import flixel.system.FlxSoundGroup;
-import openfl.media.SoundTransform;
-#if desktop
+#if cpp
 import Discord.DiscordClient;
+#end
+#if sys
 import sys.thread.Thread;
 #end
 import flixel.FlxG;
@@ -56,7 +54,7 @@ class TitleState extends MusicBeatState
 	override public function create():Void
 	{
 		//init shit
-		FlxG.save.bind('funkin', 'ninjamuffin99');
+		FlxG.save.bind('kannada', 'TheGamingCat86');
     
 		Highscore.load();
 		PlayerSettings.init();
@@ -72,7 +70,7 @@ class TitleState extends MusicBeatState
 		FlxG.game.focusLostFramerate = 60;
 		FlxG.autoPause = false;
 
-		#if desktop
+		#if cpp
 		DiscordClient.initialize();
 		#end
 
@@ -91,10 +89,10 @@ class TitleState extends MusicBeatState
 		});
 		#end
 
-		#if desktop		
+		#if cpp		
 		Application.current.onExit.add(exitCode -> {
 			DiscordClient.shutdown();
-		 });
+		});
 		#end
 	}
 

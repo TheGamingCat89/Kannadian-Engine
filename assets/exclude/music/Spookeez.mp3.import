@@ -1,0 +1,15 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+path="res://.import/Spookeez.mp3-cb9c6f85f7b348b672715b36cbfca840.mp3str"
+
+[deps]
+
+source_file="res://assets/exclude/music/Spookeez.mp3"
+dest_files=[ "res://.import/Spookeez.mp3-cb9c6f85f7b348b672715b36cbfca840.mp3str" ]
+
+[params]
+
+loop=true
+loop_offset=0

@@ -1,0 +1,4 @@
+function update(elapsed)
+{
+    PlayState.SONG.speed = FlxMath.lerp(0.1, 6, Conductor.songPosition / FlxG.sound.music.length);
+}

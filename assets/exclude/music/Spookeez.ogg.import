@@ -1,0 +1,15 @@
+[remap]
+
+importer="ogg_vorbis"
+type="AudioStreamOGGVorbis"
+path="res://.import/Spookeez.ogg-0348d6935e9fbf9020912b47061e8d5e.oggstr"
+
+[deps]
+
+source_file="res://assets/exclude/music/Spookeez.ogg"
+dest_files=[ "res://.import/Spookeez.ogg-0348d6935e9fbf9020912b47061e8d5e.oggstr" ]
+
+[params]
+
+loop=true
+loop_offset=0

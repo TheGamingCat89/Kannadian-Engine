@@ -1,12 +1,15 @@
 package;
 
+import haxe.macro.PositionTools;
+import haxe.macro.Expr.Position;
+import haxe.exceptions.PosException;
 import flixel.FlxG;
 import lime.system.System;
 import openfl.text.TextField;
 import openfl.errors.Error;
 import openfl.events.ErrorEvent;
 import openfl.events.UncaughtErrorEvents;
-#if desktop
+#if cpp
 import Discord.DiscordClient;
 #end
 import lime.app.Application;
@@ -36,7 +39,7 @@ class Main extends Sprite
 	var framerate:Int = 144; // How many frames per second the game should run at.
 	var skipSplash:Bool = true; // Whether to skip the flixel splash screen that appears in release mode.
 	var startFullscreen:Bool = false; // Whether to start the game in fullscreen on desktop targets
-	
+
 	public static final version:String = "0.0.1.2";
 	public static var FPS:FPS;
 	public static var MEM:MEM;
@@ -126,7 +129,9 @@ class Main extends Sprite
 
 		Application.current.window.alert(uncaughtRejection.error + "\n\n" + message, "Unhandled Rejection");
 
+		#if cpp
 		DiscordClient.shutdown();
+		#end
 		Sys.exit(1);
 	}
 	#end

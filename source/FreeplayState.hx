@@ -41,6 +41,7 @@ class FreeplayState extends MusicBeatState
 	public static var curWeekSelected:Int = 0;
 	public static var curSongSelected:Int = 0;
 	public static var curDifficulty:Int = 1;
+	public static var isInGameChanger:Bool = false;
 
 	var scoreText:FlxText;
 	var diffText:FlxText;
@@ -242,6 +243,8 @@ class FreeplayState extends MusicBeatState
 
 	override function keyDown(event:KeyboardEvent) {
 
+		if (FreeplayState.isInGameChanger) return;
+
 		if (event.keyCode == Keyboard.UP)
 			changeSelection(-1);
 		if (event.keyCode == Keyboard.DOWN)
@@ -251,6 +254,12 @@ class FreeplayState extends MusicBeatState
 			changeDiff(-1);
 		if (event.keyCode == Keyboard.RIGHT)
 			changeDiff(1);
+
+		if (event.keyCode == Keyboard.CONTROL && !isWeek)
+		{
+			openSubState(new GameplayChangers());
+			FreeplayState.isInGameChanger = true;
+		}
 
 		if (event.keyCode == Keyboard.ESCAPE)
 		{
@@ -396,6 +405,7 @@ class FreeplayState extends MusicBeatState
 		var curIcon = grpIcons.members[(isWeek ? curWeekSelected : curSongSelected)];
 		curIcon.scale.x = curIcon.scale.y = FlxMath.lerp(curIcon.scale.x, 1, CoolUtil.lerpShit(elapsed, 9.8));
 
+		@:privateAccess
 		bg.scale.x = bg.scale.y = FlxMath.lerp(bg.scale.x, 1, CoolUtil.lerpShit(elapsed, 9.8));
 
 		var gamepad:FlxGamepad = FlxG.gamepads.lastActive;

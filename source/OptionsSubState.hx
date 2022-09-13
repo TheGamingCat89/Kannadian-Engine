@@ -31,7 +31,7 @@ class OptionsSubState extends MusicBeatSubstate
 			"Reset Button" => FlxG.save.data.resetButton,
 			"Simple Accuracy" => FlxG.save.data.simpleAccuracy,
 			"Show Rating" => FlxG.save.data.showRating,
-			"Key Bindings" => null //uhhh i dont think thats needed
+			"Key Bindings" => null, //uhhh i dont think thats needed
 		],
 		"Appearance" => [
 			//"Antialiasing" => FlxG.save.data.antialiasing,
@@ -148,6 +148,9 @@ class OptionsSubState extends MusicBeatSubstate
 					case "Camera zoom":
 						optionsMap[curSelectedCatText][grpOptions.members[curOptSelected].text] = !optionsMap[curSelectedCatText][grpOptions.members[curOptSelected].text];
 						FlxG.save.data.cameraZoom = optionsMap[curSelectedCatText][grpOptions.members[curOptSelected].text];
+					case "Bot Play":
+						optionsMap[curSelectedCatText][grpOptions.members[curOptSelected].text] = !optionsMap[curSelectedCatText][grpOptions.members[curOptSelected].text];
+						FlxG.save.data.botPlay = optionsMap[curSelectedCatText][grpOptions.members[curOptSelected].text];
 				}
 				//hopefully works? dont mind the mess
 				var value = optionsMap[curSelectedCatText][grpOptions.members[curOptSelected].text];

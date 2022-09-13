@@ -1,4 +1,4 @@
-#if desktop
+#if cpp
 package;
 
 import Sys.sleep;

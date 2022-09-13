@@ -16,11 +16,9 @@ import flixel.FlxSprite;
 import flixel.FlxG;
 #if cpp
 import cpp.Lib;
-#end
-import flixel.tweens.FlxEase;
-#if desktop
 import Discord.DiscordClient;
 #end
+import flixel.tweens.FlxEase;
 import flixel.math.FlxMath;
 import openfl.Assets;
 #if sys
@@ -56,7 +54,7 @@ class HScript
         try {
             interpreter.execute(parser.parseString(file));
         } catch(e) {
-            Application.current.window.alert("line: " + parser.line, "Unexpected: " + e); //i forgot the parse shit but whatever
+            Application.current.window.alert("line: " + parser.line + "\n" + e, "Error on HaxeScript"); //i forgot the parse shit but whatever
             FlxG.resetState();
             hadError = true;
         }
@@ -82,9 +80,6 @@ class HScript
         interpreter.variables.set("Alphabet", Alphabet);
         interpreter.variables.set("Character", Character);
         interpreter.variables.set("Conductor", Conductor);
-        #if desktop
-        interpreter.variables.set("Discord", DiscordClient);
-        #end
         interpreter.variables.set("Note", Note);
         interpreter.variables.set("Song", Song);
         interpreter.variables.set("Application", Application);
@@ -93,6 +88,7 @@ class HScript
         interpreter.variables.set("Options", OptionsMenu.options);
         #if cpp
         interpreter.variables.set("Lib", Lib);
+        interpreter.variables.set("Discord", DiscordClient);
         #end
         #if sys 
         interpreter.variables.set("System", System); 
