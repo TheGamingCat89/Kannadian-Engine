@@ -1,4 +1,13 @@
-trace("loaded script");
+import PlayState;
+import Std;
+import flixel.FlxSprite;
+import flixel.FlxG;
+import flixel.tweens.FlxTween;
+
+function create()
+{
+    trace("loaded script");
+}
 
 function opponentNoteHit(daNote)
 {
@@ -22,7 +31,7 @@ function opponentNoteHit(daNote)
     var fuck = FlxG.random.bool(70);
 
 	if (fuck) crossFade.velocity.x = -12 * 5;
-	else velocity.x =  12 * 5;	
+	else crossFade.velocity.x =  12 * 5;	
 
 	FlxTween.tween(crossFade, {alpha: 0}, 0.35, {
 		onComplete: function(twn)
@@ -33,7 +42,5 @@ function opponentNoteHit(daNote)
 		}
 	});
 
-    PlayState.instance.add(crossFade);
-
-	//PlayState.instance.insert(PlayState.instance.indexOf(PlayState.instance.dad) - 1, crossFade);
+	PlayState.instance.insert(PlayState.instance.members.indexOf(PlayState.instance.dad) - 1, crossFade);
 }

@@ -51,11 +51,8 @@ class StoryMenuState extends MusicBeatState
 		transIn = FlxTransitionableState.defaultTransIn;
 		transOut = FlxTransitionableState.defaultTransOut;
 
-		if (FlxG.sound.music != null)
-		{
-			if (!FlxG.sound.music.playing)
-				FlxG.sound.playMusic(Paths.music('freakyMenu'));
-		}
+		if (!FlxG.sound.music.playing)
+			FlxG.sound.playMusic(Paths.music('freakyMenu'));
 
 		#if html5 var weeksFiles = ["week0.json","week1.json","week2.json","week3.json","week4.json","week5.json","week6.json","week7.json"]; #end
 
@@ -93,8 +90,6 @@ class StoryMenuState extends MusicBeatState
 
 		grpLocks = new FlxTypedGroup<FlxSprite>();
 		add(grpLocks);
-
-		trace("Line 70");
 		
 		#if cpp
 		// Updating Discord Rich Presence
@@ -124,8 +119,6 @@ class StoryMenuState extends MusicBeatState
 				grpLocks.add(lock);
 			}
 		}
-
-		trace("Line 96");
 
 		for (char in 0...3)
 		{
@@ -158,8 +151,6 @@ class StoryMenuState extends MusicBeatState
 		difficultySelectors = new FlxGroup();
 		add(difficultySelectors);
 
-		trace("Line 124");
-
 		leftArrow = new FlxSprite(grpWeekText.members[0].x + grpWeekText.members[0].width + 10, grpWeekText.members[0].y + 10);
 		leftArrow.frames = ui_tex;
 		leftArrow.animation.addByPrefix('idle', "arrow left");
@@ -184,8 +175,6 @@ class StoryMenuState extends MusicBeatState
 		rightArrow.animation.play('idle');
 		difficultySelectors.add(rightArrow);
 
-		trace("Line 150");
-
 		add(yellowBG);
 		add(grpWeekCharacters);
 
@@ -199,8 +188,6 @@ class StoryMenuState extends MusicBeatState
 		add(txtWeekTitle);
 
 		updateText();
-
-		trace("Line 165");
 
 		super.create();
 	}
@@ -434,7 +421,7 @@ class StoryMenuState extends MusicBeatState
 		grpWeekCharacters.members[1].dance();
 		grpWeekCharacters.members[2].dance();
 
-		if (PlayState.SONG.notes[Math.floor(curStep / 16)] != null && PlayState.SONG.notes[Math.floor(curStep / 16)].changeBPM)
-			Conductor.changeBPM(PlayState.SONG.notes[Math.floor(curStep / 16)].bpm);
+		if (PlayState.SONG.notes[Math.floor(curStep / 16)] != null && PlayState.SONG.sections[Math.floor(curStep / 16)].changeBPM.active)
+			Conductor.changeBPM(PlayState.SONG.sections[Math.floor(curStep / 16)].changeBPM.bpm);
 	}
 }

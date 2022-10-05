@@ -2,30 +2,14 @@ package;
 
 //i forgot i was doing this LOL
 //ill work on it.. later
-import haxe.Exception;
-import openfl.ui.Keyboard;
+import haxe.CallStack;
+import flixel.util.FlxColor;
+import hscript.*;
 import lime.app.Application;
-import lime.system.System;
-import flixel.util.FlxTimer;
-import flixel.tweens.FlxTween;
-import flixel.system.FlxSound;
-import flixel.text.FlxText;
-import flixel.group.FlxGroup.FlxTypedGroup;
-import flixel.FlxObject;
-import flixel.FlxSprite;
-import flixel.FlxG;
-#if cpp
-import cpp.Lib;
-import Discord.DiscordClient;
-#end
-import flixel.tweens.FlxEase;
-import flixel.math.FlxMath;
 import openfl.Assets;
 #if sys
 import sys.FileSystem;
 #end
-import hscript.Interp;
-import hscript.Parser;
 
 using StringTools;
 
@@ -34,7 +18,9 @@ class HScript
     public var interpreter:Interp;
     public var variables:Map<String, Dynamic>;
     public var parser:Parser;
+
     static private var hadError:Bool = false;
+    private var checker:Checker;
 
     //hope this works
     public function new(path:String)
@@ -50,16 +36,62 @@ class HScript
         }
 
         interpreter = new Interp();
+    
+        //to use require just do it like this !!!
+        // var PlayState = require("PlayState");
+        // var Json = require("haxe.Json"); 
+        interpreter.variables.set("require", Type.resolveClass);
+
         parser = new Parser();
+        parser.allowJSON = true;
+        parser.preprocesorValues.set("sys", #if sys "1" #else "0" #end); //IM NOT SURE HOW THIS WORKS LOL
+        parser.preprocesorValues.set("cpp", #if cpp "1" #else "0" #end);
+
         try {
+            checker = new Checker();
+            checker.check(parser.parseString(file), null, true);
             interpreter.execute(parser.parseString(file));
         } catch(e) {
-            Application.current.window.alert("line: " + parser.line + "\n" + e, "Error on HaxeScript"); //i forgot the parse shit but whatever
-            FlxG.resetState();
+            if (e.toString() == "Null Object Reference")
+            {
+                var m = "", c = CallStack.callStack();
+                for (i in c)
+                {
+                    switch (i)
+                    {
+                        case FilePos(s, file, line, column):
+                            m+='$file (line $line)\n';
+                        default:
+                    }
+                }
+                Application.current.window.alert(e + "\n\n" + m + "\n\nRemoving script to continue gameplay.", "Error on HaxeScript");
+            }
+            else
+                Application.current.window.alert('$path ' + e.toString() + "\n\nRemoving script to continue gameplay.", "Error on HaxeScript");
+
             hadError = true;
         }
 
-        setVars();
+        interpreter.variables.set("FlxColorFromString", function(str) {
+            var result:Null<FlxColor> = null;
+            str = StringTools.trim(str);
+            @:privateAccess
+            if (FlxColor.COLOR_REGEX.match(str)) {
+                var hexColor:String = "0x" + FlxColor.COLOR_REGEX.matched(2);
+                result = new FlxColor(Std.parseInt(hexColor));
+                if (hexColor.length == 8)
+                    result.alphaFloat = 1;
+            } else {
+                str = str.toUpperCase();
+                for (key in FlxColor.colorLookup.keys()) {
+                    if (key.toUpperCase() == str) {
+                        result = new FlxColor(FlxColor.colorLookup.get(key));
+                        break;
+                    }
+                }
+            }
+            return result;
+        });
     }
 
     public function call(Function:String, Arguments:Array<Dynamic>)
@@ -68,45 +100,6 @@ class HScript
         if (!interpreter.variables.exists(Function)) return;
 
         var shit = interpreter.variables.get(Function);
-        Reflect.callMethod(interpreter, shit, Arguments);
-    }
-
-    function setVars()
-    {
-        //classes
-        interpreter.variables.set("CoolUtil", CoolUtil);
-        interpreter.variables.set("PlayState", PlayState);
-        interpreter.variables.set("Paths", Paths);
-        interpreter.variables.set("Alphabet", Alphabet);
-        interpreter.variables.set("Character", Character);
-        interpreter.variables.set("Conductor", Conductor);
-        interpreter.variables.set("Note", Note);
-        interpreter.variables.set("Song", Song);
-        interpreter.variables.set("Application", Application);
-        interpreter.variables.set("Keyboard", Keyboard);
-        interpreter.variables.set("Std", Std);
-        interpreter.variables.set("Options", OptionsMenu.options);
-        #if cpp
-        interpreter.variables.set("Lib", Lib);
-        interpreter.variables.set("Discord", DiscordClient);
-        #end
-        #if sys 
-        interpreter.variables.set("System", System); 
-        #end
-        interpreter.variables.set("Assets", Assets);
-
-        //flx
-        interpreter.variables.set("FlxG", FlxG);
-        interpreter.variables.set("FlxSprite", FlxSprite);
-        interpreter.variables.set("FlxObject", FlxObject);
-        interpreter.variables.set("FlxSpriteTypedGroup", function(limit:Int){
-            return new FlxTypedGroup<FlxSprite>(limit); //i hate this
-        });
-        interpreter.variables.set("FlxMath", FlxMath);
-        interpreter.variables.set("FlxText", FlxText);
-        interpreter.variables.set("FlxSound", FlxSound);
-        interpreter.variables.set("FlxTween", FlxTween);
-        interpreter.variables.set("FlxEase", FlxEase);
-        interpreter.variables.set("FlxTimer", FlxTimer);
+        try Reflect.callMethod(interpreter, shit, Arguments) catch(e)0;
     }
 }

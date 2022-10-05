@@ -26,6 +26,7 @@ class Character extends FlxSprite
 	public var iconColor:FlxColor;
 
 	public var holding:Bool = false;
+	public var stunned:Bool = false;
 
 	public function new(x:Float, y:Float, ?character:String = "bf", ?isPlayer:Bool = false)
 	{
@@ -500,20 +501,33 @@ class Character extends FlxSprite
 
 	override function update(elapsed:Float)
 	{
-		if (!curCharacter.startsWith('bf'))
+		if (animation.curAnim != null && animation.curAnim.name.startsWith('sing'))
+			holdTimer += elapsed;
+
+		if (!debugMode)
 		{
-			if (animation.curAnim != null && animation.curAnim.name.startsWith('sing'))
-				holdTimer += elapsed;
-
-			var dadVar:Float = 4;
-
-			if (curCharacter == 'dad')
-				dadVar = 6.1;
-			if (holdTimer >= Conductor.stepCrochet * dadVar * 0.001)
-			{
-				dance();
+			if (!animation.curAnim.name.startsWith('sing'))
 				holdTimer = 0;
+	
+			if (animation.curAnim.name.endsWith('miss') && animation.curAnim.finished && !debugMode)
+			{
+				playAnim('idle', true, false, 10);
 			}
+	
+			if (animation.curAnim.name == 'firstDeath' && animation.curAnim.finished && curCharacter == "bf")
+			{
+				playAnim('deathLoop');
+			}
+		}
+
+		var dadVar:Float = 4;
+
+		if (curCharacter == 'dad')
+			dadVar = 6.1;
+		if (holdTimer >= Conductor.stepCrochet * dadVar * 0.001)
+		{
+			dance();
+			holdTimer = 0;
 		}
 
 		switch (curCharacter)
@@ -599,7 +613,9 @@ class Character extends FlxSprite
 
 	public function playAnim(AnimName:String, Force:Bool = false, Reversed:Bool = false, Frame:Int = 0):Void
 	{
-		animation.play(AnimName, Force, Reversed, Frame);
+		if (animation.exists(AnimName))
+			animation.play(AnimName, Force, Reversed, Frame);
+		else trace(AnimName + " doesn't exist on the current character");
 
 		var daOffset = animOffsets.get(AnimName);
 		if (animOffsets.exists(AnimName))

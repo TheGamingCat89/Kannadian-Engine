@@ -1,5 +1,8 @@
 package;
 
+import Song.SwaggiestSong;
+import Section.SwaggiestSection;
+import flixel.util.FlxStringUtil;
 import openfl.ui.Keyboard;
 import openfl.events.KeyboardEvent;
 import haxe.Json;
@@ -45,6 +48,7 @@ class FreeplayState extends MusicBeatState
 
 	var scoreText:FlxText;
 	var diffText:FlxText;
+	var infoText:FlxText;
 	var lerpScore:Int = 0;
 	var intendedScore:Int = 0;
 	var combo:String = '';
@@ -63,7 +67,7 @@ class FreeplayState extends MusicBeatState
 	private var grpIcons:FlxTypedGroup<HealthIcon>;
 
 	public static var curWeek:Int = 0;
-	public static var songData:Map<String,Array<SwagSong>> = [];
+	public static var songData:Map<String,Array<SwaggiestSong>> = [];
 
 	public static var isWeek:Bool = true;
 
@@ -71,12 +75,12 @@ class FreeplayState extends MusicBeatState
 	var colorTween:FlxTween = null;
 	var iconColor:String;
 
-	public static function loadDiff(diff:Int, format:String, name:String, array:Array<SwagSong>)
+	public static function loadDiff(diff:Int, format:String, name:String, array:Array<SwaggiestSong>)
 	{
 		try {
 			array.push(Song.loadFromJson(Highscore.formatSong(format, diff), name));
-		} catch(ex) {
-			trace(ex);
+		} catch(e) {
+			trace(e);
 		}
 	}
 
@@ -215,6 +219,10 @@ class FreeplayState extends MusicBeatState
 		authorTxt.font = scoreText.font;
 		add(authorTxt);
 
+		infoText = new FlxText(authorTxt.x, authorTxt.y + 20, "", 24);
+		infoText.font = scoreText.font;
+		add(infoText);
+
 		add(scoreText);	
 
 		#if PRELOAD_ALL
@@ -311,7 +319,7 @@ class FreeplayState extends MusicBeatState
 					grpIcons.add(icon);
 				}
 				curSongSelected = 0;
-				changeSelection();
+				changeSelection();		
 			}
 			else
 			{	
@@ -327,8 +335,14 @@ class FreeplayState extends MusicBeatState
 		}
 
 		if(event.keyCode == Keyboard.SPACE)
-		{
-			#if PRELOAD_ALL
+			playSong();
+
+		super.keyUp(event);
+	}
+
+	private function playSong()
+	{
+		#if PRELOAD_ALL
 			if(instPlaying != weeks[curWeekSelected].songs[curSongSelected].songName.toLowerCase() && !isWeek)
 			{
 				var diffs = songData.get(weeks[curWeekSelected].songs[curSongSelected].songName);
@@ -353,7 +367,7 @@ class FreeplayState extends MusicBeatState
 				}
 	
 				PlayState.SONG = song;
-	
+
 				FlxG.sound.music.volume = 0;
 	
 				instPlaying = weeks[curWeekSelected].songs[curSongSelected].songName.toLowerCase();
@@ -377,16 +391,14 @@ class FreeplayState extends MusicBeatState
 				});
 			}
 			#end
-		}
-
-		super.keyUp(event);
 	}
 	
 	override function update(elapsed:Float)
 	{
 		super.update(elapsed);
 
-		if (FlxG.sound.music != null)
+		@:privateAccess
+		if (FlxG.sound.music != null && FlxG.sound.music._sound != null)
 		{
 			if (FlxG.sound.music.volume < 0.7)
 				FlxG.sound.music.volume += 0.5 * FlxG.elapsed;
@@ -442,6 +454,7 @@ class FreeplayState extends MusicBeatState
 
 		diffText.x = scoreBG.x + (scoreBG.width / 2) - (diffText.width / 2);
 		authorTxt.x = scoreBG.x + (scoreBG.width / 2) - (authorTxt.width / 2);
+		infoText.x = scoreBG.x + (scoreBG.width / 2) - (infoText.width / 2);
 	}
 
 	function changeDiff(change:Int = 0)
@@ -502,11 +515,13 @@ class FreeplayState extends MusicBeatState
 		}
 
 		authorTxt.text = "By: " + weeks[curWeekSelected].songs[curSongSelected].songAuthor;
+		infoText.text = "Song Length: " + FlxStringUtil.formatTime(openfl.Assets.getMusic(Paths.inst(weeks[curWeekSelected].songs[curSongSelected].songName.toLowerCase())).length / 1000);
 		
 		scoreBG.visible = !isWeek;
 		scoreText.visible = !isWeek;
 		diffText.visible = !isWeek;
 		authorTxt.visible = !isWeek;
+		infoText.visible = !isWeek;
 		#if PRELOAD_ALL
 		text.visible = !isWeek;
 		textBG.visible = !isWeek;
@@ -574,8 +589,8 @@ class FreeplayState extends MusicBeatState
 		if (OptionsMenu.options.cameraZoom) //not zoom but anyway
 			bg.scale.x = bg.scale.y = zoomShit;
 
-		if (PlayState.SONG.notes[Math.floor(curStep / 16)] != null && PlayState.SONG.notes[Math.floor(curStep / 16)].changeBPM)
-			Conductor.changeBPM(PlayState.SONG.notes[Math.floor(curStep / 16)].bpm);
+		if (PlayState.SONG.notes[Math.floor(curStep / 16)] != null && PlayState.SONG.sections[Math.floor(curStep / 16)].changeBPM.active)
+			Conductor.changeBPM(PlayState.SONG.sections[Math.floor(curStep / 16)].changeBPM.bpm);
 	}
 
 	override function destroy() {

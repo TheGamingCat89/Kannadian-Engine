@@ -219,7 +219,7 @@ class MainMenuState extends MusicBeatState
 	override function beatHit() {
 		super.beatHit();
 
-		if (PlayState.SONG.notes[Math.floor(curStep / 16)] != null && PlayState.SONG.notes[Math.floor(curStep / 16)].changeBPM)
-			Conductor.changeBPM(PlayState.SONG.notes[Math.floor(curStep / 16)].bpm);
+		if (PlayState.SONG.notes[Math.floor(curStep / 16)] != null && PlayState.SONG.sections[Math.floor(curStep / 16)].changeBPM.active)
+			Conductor.changeBPM(PlayState.SONG.sections[Math.floor(curStep / 16)].changeBPM.bpm);
 	}
 }

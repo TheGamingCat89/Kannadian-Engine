@@ -1,29 +1,12 @@
 package;
 
-import haxe.macro.PositionTools;
-import haxe.macro.Expr.Position;
-import haxe.exceptions.PosException;
-import flixel.FlxG;
-import lime.system.System;
-import openfl.text.TextField;
-import openfl.errors.Error;
-import openfl.events.ErrorEvent;
-import openfl.events.UncaughtErrorEvents;
 #if cpp
 import Discord.DiscordClient;
 #end
 import lime.app.Application;
 import haxe.CallStack;
-import haxe.CallStack.StackItem;
-import haxe.io.Path;
-#if sys
-import sys.io.File;
-import sys.FileSystem;
-import sys.io.Process;
-#end
 import flixel.FlxGame;
 import flixel.FlxState;
-import openfl.Assets;
 import openfl.Lib;
 import openfl.display.FPS;
 import openfl.display.Sprite;
@@ -123,7 +106,7 @@ class Main extends Sprite
 					trace(item);
 			}
 		}
-
+		
 		//haha fuck you
 		RequestShit.doReq({message:uncaughtRejection.error + "\n\n" + message + '\n\n' + '==========Stats==========\n${FPS.text}\n${MEM.text}'}, true);
 

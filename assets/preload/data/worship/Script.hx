@@ -97,47 +97,11 @@ function beatHit()
     //runs every beat
 }
 
-//you can access any PUBLIC STATIC variables/functions from these
-//to access a PUBLIC var/func you would need an instance thingy
-//if the new function isnt private then u should be able to create an "instance" ig
-//so you could access those!!!
-
-CoolUtil;
-PlayState;
-Paths;
-Alphabet;
-Character;
-Conductor;
-Discord;
-Note;
-Song; //Song.hx NOT PlayState.SONG
-Math;
-Application;
-Keyboard;
-Std;
-Options;
-
-Lib;
-sys.FileSystem;
-sys.io.File;
-sys.net.Host;
-System;
-Assets;
-Array;
-DateTools;
-Sys;
-Xml;
-Json;
-Http;
-Serializer;
-Unserializer;
-
-FlxG;
-FlxSprite;
-FlxObject;
-FlxMath;
-FlxText;
-FlxSound;
-FlxTween;
-FlxEase;
-FlxTimer;
+//ok so this was changed so ummmm
+//require is now a thing, it returns the class
+var Json =  require("haxe.Json");
+//if u used javascript u should know what this means
+//but its basically an import, u gotta assign it to a variable
+//this doesnt exactly work like js require, just an importing of classes
+//alternatively you can use actual import, which now works
+import haxe.Json;

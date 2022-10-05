@@ -188,7 +188,11 @@ class OptionsSubState extends MusicBeatSubstate
 				changeSelection();
 			}
 			else
+			{
 				close();
+				openSubState(new OptionsSubState());
+			}
+				
 		}
 	}
 

@@ -1,5 +1,7 @@
 package;
 
+import openfl.ui.Keyboard;
+import openfl.events.KeyboardEvent;
 import haxe.macro.Context;
 #if cpp
 import cpp.Lib;
@@ -221,20 +223,28 @@ class TitleState extends MusicBeatState
 		return swagGoodArray;
 	}
 
+	var pressedEnter:Bool;
+
 	var transitioning:Bool = false;
+
+	override function keyDown(event:KeyboardEvent)
+	{
+		if (event.keyCode == Keyboard.F)
+			FlxG.fullscreen = !FlxG.fullscreen;
+
+		if (event.keyCode == Keyboard.ENTER)
+			pressedEnter = true;
+
+		super.keyDown(event);
+	}
+	
+	override function keyUp(event:KeyboardEvent) {super.keyUp(event);if(event.keyCode==Keyboard.ENTER)pressedEnter=false;}
 
 	override function update(elapsed:Float)
 	{
 		if (FlxG.sound.music != null)
 			Conductor.songPosition = FlxG.sound.music.time;
 		// FlxG.watch.addQuick('amp', FlxG.sound.music.amplitude);
-
-		if (FlxG.keys.justPressed.F)
-		{
-			FlxG.fullscreen = !FlxG.fullscreen;
-		}
-
-		var pressedEnter:Bool = FlxG.keys.justPressed.ENTER;
 
 		#if mobile
 		for (touch in FlxG.touches.list)

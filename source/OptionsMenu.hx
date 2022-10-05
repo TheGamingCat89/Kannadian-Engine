@@ -239,8 +239,8 @@ class OptionsMenu extends MusicBeatState
 			bg.scale.x = bg.scale.y = 1.02;
 		}
 
-		if (PlayState.SONG.notes[Math.floor(curStep / 16)] != null && PlayState.SONG.notes[Math.floor(curStep / 16)].changeBPM)
-			Conductor.changeBPM(PlayState.SONG.notes[Math.floor(curStep / 16)].bpm);
+		if (PlayState.SONG.notes[Math.floor(curStep / 16)] != null && PlayState.SONG.sections[Math.floor(curStep / 16)].changeBPM.active)
+			Conductor.changeBPM(PlayState.SONG.sections[Math.floor(curStep / 16)].changeBPM.bpm);
 	}
 
 	public static function loadSettings()

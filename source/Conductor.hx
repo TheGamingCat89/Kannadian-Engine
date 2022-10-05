@@ -1,5 +1,6 @@
 package;
 
+import Song.SwaggiestSong;
 import Song.SwagSong;
 
 /**
@@ -33,18 +34,18 @@ class Conductor
 	}
 
 	//is this really used smh
-	public static function mapBPMChanges(song:SwagSong)
+	public static function mapBPMChanges(song:SwaggiestSong)
 	{
 		bpmChangeMap = [];
 
 		var curBPM:Int = song.bpm;
 		var totalSteps:Int = 0;
 		var totalPos:Float = 0;
-		for (i in 0...song.notes.length)
+		for (sec in song.sections)
 		{
-			if(song.notes[i].changeBPM && song.notes[i].bpm != curBPM)
+			if(sec.changeBPM.active && sec.changeBPM.bpm != curBPM)
 			{
-				curBPM = song.notes[i].bpm;
+				curBPM = sec.changeBPM.bpm;
 				var event:BPMChangeEvent = {
 					stepTime: totalSteps,
 					songTime: totalPos,
@@ -53,7 +54,7 @@ class Conductor
 				bpmChangeMap.push(event);
 			}
 
-			var deltaSteps:Int = song.notes[i].lengthInSteps;
+			var deltaSteps:Int = sec.lengthInSteps;
 			totalSteps += deltaSteps;
 			totalPos += ((60 / curBPM) * 1000 / 4) * deltaSteps;
 		}
