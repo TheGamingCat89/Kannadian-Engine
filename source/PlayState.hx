@@ -1147,77 +1147,86 @@ class PlayState extends MusicBeatState
 		notes = new FlxTypedGroup<Note>();
 		add(notes);
 
-		for (songNotes in SONG.notes)
-		{
-			var daStrumTime:Float = songNotes.strumTime;
-			var daNoteData:Int = Std.int(songNotes.noteData % 4);
-		
-			var gottaHitNote:Bool = (GameplayChangers.changers.get("Opponent Play") ? !songNotes.mustHit : songNotes.mustHit);
-
-			var oldNote:Note;
-			if (unspawnNotes.length > 0)
-				oldNote = unspawnNotes[Std.int(unspawnNotes.length - 1)];
-			else
-				oldNote = null;
-
-			var swagNote:Note = new Note(daStrumTime, daNoteData, oldNote);
-			swagNote.sustainLength = songNotes.sustainLength;
-			swagNote.scrollFactor.set(0, 0);
-
-			var susLength:Float = swagNote.sustainLength;
-
-			susLength = susLength / Conductor.stepCrochet;
-			unspawnNotes.push(swagNote);
-
-			for (susNote in 0...Math.floor(susLength))
+		for (curSec => section in SONG.sections)
+			for (songNotes in SONG.notes)
 			{
-				oldNote = unspawnNotes[Std.int(unspawnNotes.length - 1)];
-
-				var sustainNote:Note = new Note(daStrumTime + (Conductor.stepCrochet * susNote) + Conductor.stepCrochet, daNoteData, oldNote, true);
-				sustainNote.scrollFactor.set();
-				unspawnNotes.push(sustainNote);
-
-				sustainNote.mustPress = gottaHitNote;
-
-				if (sustainNote.mustPress)
+				if (songNotes.strumTime >= (Conductor.stepCrochet * section.lengthInSteps) * curSec && songNotes.strumTime <= (Conductor.stepCrochet * section.lengthInSteps) * curSec++)
 				{
-					sustainNote.isChord = bfStrumTimes.contains(Math.round(sustainNote.strumTime));
-					bfStrumTimes.push(Math.round(sustainNote.strumTime));
-					sustainNote.x += FlxG.width / 2;
-				}
-				else
-				{
-					if (dadStrumTimes.contains(Math.round(sustainNote.strumTime)))
+					var daStrumTime:Float = songNotes.strumTime;
+					var daNoteData:Int = Std.int(songNotes.noteData % 4);
+
+					var gottaHitNote:Bool = true/*section.mustHit*/;
+
+					if (songNotes.noteData > 3)
+						gottaHitNote = !section.mustHit;
+
+					gottaHitNote = (GameplayChangers.changers.get("Opponent Play") ? !gottaHitNote : gottaHitNote);
+
+					var oldNote:Note;
+					if (unspawnNotes.length > 0)
+						oldNote = unspawnNotes[Std.int(unspawnNotes.length - 1)];
+					else
+						oldNote = null;
+
+					var swagNote:Note = new Note(daStrumTime, daNoteData, oldNote);
+					swagNote.sustainLength = songNotes.sustainLength;
+					swagNote.scrollFactor.set(0, 0);
+
+					var susLength:Float = swagNote.sustainLength;
+
+					susLength = susLength / Conductor.stepCrochet;
+					unspawnNotes.push(swagNote);
+
+					for (susNote in 0...Math.floor(susLength))
 					{
-						sustainNote.isChord = true;
-						dadStrumTimes.push(Math.round(sustainNote.strumTime));
+						oldNote = unspawnNotes[Std.int(unspawnNotes.length - 1)];
+
+						var sustainNote:Note = new Note(daStrumTime + (Conductor.stepCrochet * susNote) + Conductor.stepCrochet, daNoteData, oldNote, true);
+						sustainNote.scrollFactor.set();
+						unspawnNotes.push(sustainNote);
+
+						sustainNote.mustPress = gottaHitNote;
+
+						if (sustainNote.mustPress)
+						{
+							sustainNote.isChord = bfStrumTimes.contains(Math.round(sustainNote.strumTime));
+							bfStrumTimes.push(Math.round(sustainNote.strumTime));
+							sustainNote.x += FlxG.width / 2;
+						}
+						else
+						{
+							if (dadStrumTimes.contains(Math.round(sustainNote.strumTime)))
+							{
+								sustainNote.isChord = true;
+								dadStrumTimes.push(Math.round(sustainNote.strumTime));
+							}
+							dadStrumTimes.push(Math.round(sustainNote.strumTime));
+						}
 					}
-					dadStrumTimes.push(Math.round(sustainNote.strumTime));
-				}
-			}
 
-			swagNote.mustPress = gottaHitNote;
+					swagNote.mustPress = gottaHitNote;
 
-			if (swagNote.mustPress)
-			{
-				if (bfStrumTimes.contains(Math.round(swagNote.strumTime)))
-				{
-					swagNote.isChord = true;
-					bfStrumTimes.push(Math.round(swagNote.strumTime));
+					if (swagNote.mustPress)
+					{
+						if (bfStrumTimes.contains(Math.round(swagNote.strumTime)))
+						{
+							swagNote.isChord = true;
+							bfStrumTimes.push(Math.round(swagNote.strumTime));
+						}
+						bfStrumTimes.push(Math.round(swagNote.strumTime));
+						swagNote.x += FlxG.width / 2; // general offset
+					}
+					else
+					{	
+						if (dadStrumTimes.contains(Math.round(swagNote.strumTime)))
+						{
+							swagNote.isChord = true;
+							dadStrumTimes.push(Math.round(swagNote.strumTime));
+						}
+						dadStrumTimes.push(Math.round(swagNote.strumTime));
+					}
 				}
-				bfStrumTimes.push(Math.round(swagNote.strumTime));
-				swagNote.x += FlxG.width / 2; // general offset
 			}
-			else
-			{	
-				if (dadStrumTimes.contains(Math.round(swagNote.strumTime)))
-				{
-					swagNote.isChord = true;
-					dadStrumTimes.push(Math.round(swagNote.strumTime));
-				}
-				dadStrumTimes.push(Math.round(swagNote.strumTime));
-			}
-		}
 
 		// trace(unspawnNotes.length);
 		// playerCounter += 1;

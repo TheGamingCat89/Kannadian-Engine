@@ -1,15 +1,18 @@
 package;
 
-import openfl.Assets;
-import openfl.display.Bitmap;
-import openfl.display.Sprite;
+import FlxWindow.FlxTransWindow;
+import flixel.FlxState;
+import flixel.FlxSprite;
 
-class Test extends Sprite
+class Test extends FlxState
 {
-    public function new() {
-        super();
-
-        addChild(new Bitmap(Assets.getBitmapData(Paths.image("preloaderArt"))));
+    override function create() {
+        super.create();
+        var logo = new FlxSprite().loadGraphic(Paths.image("logo"));
+        logo.screenCenter();
+        add(logo);
         
+        FlxTransWindow.getWindowsTransparent();
+
     }
 }

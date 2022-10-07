@@ -32,16 +32,24 @@ typedef SwaggiestSong =
 	var player2:String;
 	var validScore:Bool;
 
-	var notes:Array<{noteData:Int, sustainLength:Float, strumTime:Float, mustHit:Bool}>;
+	var notes:Array<SwagNote>;
 	var sections:Array<SwaggiestSection>;
 
 	var chartVersion:String;
 }
 
+typedef SwagNote =
+{
+	var noteData:Int;
+	var sustainLength:Float;
+	var strumTime:Float;
+	//var mustHit:Bool;
+}
+
 class Song
 {
 	public var song:String;
-	public var notes:Array<{noteData:Int, sustainLength:Float, strumTime:Float, mustHit:Bool}>;
+	public var notes:Array<SwagNote>;
 	public var sections:Array<SwaggiestSection>;
 	public var bpm:Int;
 	public var needsVoices:Bool = true;
@@ -76,6 +84,8 @@ class Song
 		//just checking for old charts
 		if	(parsedShit.chartVersion == null || parsedShit.chartVersion != "1.5")
 			swagShit = translate(cast parsedShit);
+		else 
+			swagShit = cast parsedShit;
 		
 		swagShit.validScore = true;
 		return swagShit;
@@ -84,13 +94,13 @@ class Song
 	public static function translate(song:SwagSong):SwaggiestSong
 	{
 		//the only thing that really changes are how notes and sections work
-		var swagNotes:Array<{noteData:Int, sustainLength:Float, strumTime:Float}>;
-		var swagSections:Array<SwaggiestSection>;
+		var swagNotes:Array<SwagNote> = [];
+		var swagSections:Array<SwaggiestSection> = [];
 		for (i => sec in song.notes)
 		{
 			swagSections.push(
 				{
-					//mustHit: sec.mustHitSection,
+					mustHit: sec.mustHitSection,
 					lengthInSteps: sec.lengthInSteps,
 					typeOfSection: sec.typeOfSection,
 					changeBPM: {
@@ -107,7 +117,7 @@ class Song
 						noteData: note[1],
 						sustainLength: note[2],
 						strumTime: note[0],
-						mustHit: note[1] > 3 ? !sec.mustHitSection : sec.mustHitSection
+						//mustHit: note[1] > 3 ? !sec.mustHitSection : sec.mustHitSection
 					}
 				);
 		}

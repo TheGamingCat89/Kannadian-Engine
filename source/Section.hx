@@ -13,7 +13,7 @@ typedef SwagSection =
 
 typedef SwaggiestSection = 
 {
-	//var mustHit:Bool;
+	var mustHit:Bool;
 	var lengthInSteps:Int;
 	var typeOfSection:Int;
 	var changeBPM:{active:Bool,bpm:Int}; //this will most likely change later
