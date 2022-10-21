@@ -31,6 +31,8 @@ class OptionsData
             FlxG.save.data.simpleAccuracy = true;
         if (FlxG.save.data.showRating == null)
             FlxG.save.data.showRating = true;
+        if (FlxG.save.data.splashScreen == null)
+            FlxG.save.data.splashScreen = true;
 
         if (FlxG.save.data.upBind == null)
             FlxG.save.data.upBind =  W.toString();

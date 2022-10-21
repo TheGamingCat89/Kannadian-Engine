@@ -1,0 +1,8 @@
+check the source code if u want to know their specific functions available
+
+also they have to have the exact name of the class and Script at the end of them
+ill leave freeplay script there for u to look at!!!!!
+
+u can also put playstate in here and itll apply to every song
+
+THEY ALSO NEED TO EXTEND MUSICBEATSTATE OR THEY WONT WORK

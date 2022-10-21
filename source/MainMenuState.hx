@@ -133,6 +133,9 @@ class MainMenuState extends MusicBeatState
 
 	function changeItem(huh:Int = 0)
 	{
+		for (script in hscript)
+			script.call("changeItem", [huh]);
+
 		FlxG.sound.play(Paths.sound('scrollMenu'));
 
 		curSelected += huh;
@@ -216,10 +219,11 @@ class MainMenuState extends MusicBeatState
 	}
 
 	//ill see if im gonna add some beat related effects i dunno
-	override function beatHit() {
+	override function beatHit()
+	{
 		super.beatHit();
 
-		if (PlayState.SONG.notes[Math.floor(curStep / 16)] != null && PlayState.SONG.sections[Math.floor(curStep / 16)].changeBPM.active)
+		if (PlayState.SONG != null && PlayState.SONG.sections[Math.floor(curStep / 16)] != null && PlayState.SONG.sections[Math.floor(curStep / 16)].changeBPM.active)
 			Conductor.changeBPM(PlayState.SONG.sections[Math.floor(curStep / 16)].changeBPM.bpm);
 	}
 }

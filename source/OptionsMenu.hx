@@ -13,17 +13,18 @@ import flixel.FlxSprite;
 
 typedef Options =
 {
-	@:optional public var ghostTapping:Bool;
-	@:optional public var downScroll:Bool;
-	@:optional public var simpleAccuracy:Bool;
-	@:optional public var middleScroll:Bool;
-	@:optional public var songPosition:Bool;
-	@:optional public var resetButton:Bool;
-	@:optional public var showRating:Bool;
-	@:optional public var antialiasing:Bool;
-	@:optional public var flashing:Bool;
-	@:optional public var cameraZoom:Bool;
-	@:optional public var botPlay:Bool;
+	var ?ghostTapping:Bool;
+	var ?downScroll:Bool;
+	var ?simpleAccuracy:Bool;
+	var ?middleScroll:Bool;
+	var ?songPosition:Bool;
+	var ?resetButton:Bool;
+	var ?showRating:Bool;
+	var ?antialiasing:Bool;
+	var ?flashing:Bool;
+	var ?cameraZoom:Bool;
+	var ?botPlay:Bool;
+	var ?splashScreen:Bool;
 }
 
 class OptionsMenu extends MusicBeatState
@@ -38,7 +39,13 @@ class OptionsMenu extends MusicBeatState
 
 	public static var isInOptionCat:Bool = false;
 	
-	//general options
+	/**
+	 * You can add your own option here
+	 * you gotta add it in `Options` typedef, `OptionsData` class,
+	 * and in the `loadSettings` method in `OptionsMenu` class
+	 * 
+	 * IF your options is not a bool value, add it in line ~150
+	 */
 	public var optionsMap:Map<String, Map<String, Dynamic>> = [
 		"Gameplay" => [
 			"Ghost Tapping" => FlxG.save.data.ghostTapping,
@@ -54,6 +61,7 @@ class OptionsMenu extends MusicBeatState
 			"Antialiasing" => FlxG.save.data.antialiasing,
 			"Flashing" => FlxG.save.data.flashing,
 			"Camera Zoom" => FlxG.save.data.cameraZoom,
+			"Splash Screen" => FlxG.save.data.splashScreen
 		],
 	];
 	var optionsLength:Int = 0;// .length isnt a thing akjgldvfj;lk
@@ -131,10 +139,6 @@ class OptionsMenu extends MusicBeatState
 			}
 			else
 			{
-				//im so fucking sorry for this oh my god
-				//ill find a way to optimize it.. i hope
-				//wish FlxG.save.data["thing"] was a Map fr	
-				//figured out a better way youll have a nicer looking thingy of this soon!!! maybe i hope idk :sob:
 				var text = grpOptions.members[curOptSelected].text;
 				var nonBoolOpt = !(optionsMap[curSelectedCatText][text] is Bool);
 				
@@ -157,15 +161,15 @@ class OptionsMenu extends MusicBeatState
 				//hopefully works? dont mind the mess
 				var value = optionsMap[curSelectedCatText][text];
 				if (value is Bool)
-					if(value) grpOptions.members[curOptSelected].color = FlxColor.GREEN;
-					else grpOptions.members[curOptSelected].color = FlxColor.RED;
-				if(value == null)
+					if(value)
+						grpOptions.members[curOptSelected].color = FlxColor.GREEN;
+					else
+						grpOptions.members[curOptSelected].color = FlxColor.RED;
+				else
 					grpOptions.members[curOptSelected].color = FlxColor.WHITE;
 
 				FlxG.save.flush();
 				OptionsMenu.loadSettings();
-
-				
 			}
 		}
 
@@ -239,7 +243,7 @@ class OptionsMenu extends MusicBeatState
 			bg.scale.x = bg.scale.y = 1.02;
 		}
 
-		if (PlayState.SONG.notes[Math.floor(curStep / 16)] != null && PlayState.SONG.sections[Math.floor(curStep / 16)].changeBPM.active)
+		if (PlayState.SONG != null && PlayState.SONG.notes[Math.floor(curStep / 16)] != null && PlayState.SONG.sections[Math.floor(curStep / 16)].changeBPM.active)
 			Conductor.changeBPM(PlayState.SONG.sections[Math.floor(curStep / 16)].changeBPM.bpm);
 	}
 
@@ -256,7 +260,8 @@ class OptionsMenu extends MusicBeatState
 			antialiasing: FlxG.save.data.antialiasing,
 			flashing: FlxG.save.data.flashing,
 			cameraZoom: FlxG.save.data.cameraZoom,
-			botPlay: FlxG.save.data.botPlay
+			botPlay: FlxG.save.data.botPlay, 
+			splashScreen: FlxG.save.data.splashScreen
 		}
 	}
 }

@@ -501,15 +501,14 @@ class Character extends FlxSprite
 
 	override function update(elapsed:Float)
 	{
-		if (animation.curAnim != null && animation.curAnim.name.startsWith('sing'))
-			holdTimer += elapsed;
-
 		if (!debugMode)
 		{
-			if (!animation.curAnim.name.startsWith('sing'))
+			if (animation.curAnim.name.startsWith('sing'))
+				holdTimer += elapsed;
+			else
 				holdTimer = 0;
 	
-			if (animation.curAnim.name.endsWith('miss') && animation.curAnim.finished && !debugMode)
+			if (animation.curAnim.name.endsWith('miss') && animation.curAnim.finished)
 			{
 				playAnim('idle', true, false, 10);
 			}
@@ -521,9 +520,9 @@ class Character extends FlxSprite
 		}
 
 		var dadVar:Float = 4;
-
 		if (curCharacter == 'dad')
 			dadVar = 6.1;
+
 		if (holdTimer >= Conductor.stepCrochet * dadVar * 0.001)
 		{
 			dance();

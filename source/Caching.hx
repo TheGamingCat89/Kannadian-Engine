@@ -35,7 +35,8 @@ class Caching extends MusicBeatState
 
 	private function preload()
 	{
-		trace("caching shit");
+		//this is not good i dont want too much ram consumption, i'd rather have stuff load between states
+		/*trace("caching shit");
 
         var blacklist = ['lol.png', 'backspace.png', 'grafix.png', 'lose.png', 'screencapTierImage.png', 'week54prototype.png', 'zzzzzzzz.png', 'logo.png', 'preloaderArt.png'];
 		FlxGraphic.defaultPersist = true;
@@ -53,7 +54,7 @@ class Caching extends MusicBeatState
 				FlxG.bitmap.add(Paths.image('characters/' + file.split(".")[0], 'shared'));
 
 		//I HOPE IT WORKS :SOB:
-		/*for (i in 1...6) //each folder
+		for (i in 1...6) //each folder
 			for (HII in FileSystem.readDirectory(FileSystem.absolutePath("assets/week" + i))) //HII = images folder
 				try { 
 					for (fuck in FileSystem.readDirectory(FileSystem.absolutePath(HII)))//IMAGE OR FOLDER INSIDE OF IMAGES FOLDER

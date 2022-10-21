@@ -242,6 +242,9 @@ class FreeplayState extends MusicBeatState
 		changeDiff();
 
 		super.create();
+
+		for (script in hscript)
+			script.call("createPost");
 	}
 
 	public function addWeek(weekName:String, songs:Array<FreeplaySongMetadata>, weekNum:Int)
@@ -455,10 +458,16 @@ class FreeplayState extends MusicBeatState
 		diffText.x = scoreBG.x + (scoreBG.width / 2) - (diffText.width / 2);
 		authorTxt.x = scoreBG.x + (scoreBG.width / 2) - (authorTxt.width / 2);
 		infoText.x = scoreBG.x + (scoreBG.width / 2) - (infoText.width / 2);
+
+		for (script in hscript)
+			script.call("updatePost", [elapsed]);
 	}
 
 	function changeDiff(change:Int = 0)
 	{
+		for (script in hscript)
+			script.call("changeDiff", [change]);
+
 		if (isWeek) return;
 
 		var songDiffs = weeks[curWeekSelected].songs[curSongSelected].diffs;
@@ -481,6 +490,9 @@ class FreeplayState extends MusicBeatState
 
 	function changeSelection(change:Int = 0)
 	{
+		for (script in hscript)
+			script.call("changeSelection", [change]);
+
 		FlxG.sound.play(Paths.sound('scrollMenu'), 0.4);
 
 		(isWeek ? curWeekSelected += change : curSongSelected += change);
@@ -589,7 +601,7 @@ class FreeplayState extends MusicBeatState
 		if (OptionsMenu.options.cameraZoom) //not zoom but anyway
 			bg.scale.x = bg.scale.y = zoomShit;
 
-		if (PlayState.SONG.notes[Math.floor(curStep / 16)] != null && PlayState.SONG.sections[Math.floor(curStep / 16)].changeBPM.active)
+		if (PlayState.SONG != null && PlayState.SONG.sections[Math.floor(curStep / 16)] != null && PlayState.SONG.sections[Math.floor(curStep / 16)].changeBPM.active)
 			Conductor.changeBPM(PlayState.SONG.sections[Math.floor(curStep / 16)].changeBPM.bpm);
 	}
 

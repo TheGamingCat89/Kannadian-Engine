@@ -33,7 +33,6 @@ import flixel.tweens.FlxEase;
 import flixel.tweens.FlxTween;
 import flixel.util.FlxColor;
 import flixel.util.FlxTimer;
-import io.newgrounds.NG;
 import lime.app.Application;
 import openfl.Assets;
 
@@ -55,27 +54,6 @@ class TitleState extends MusicBeatState
 
 	override public function create():Void
 	{
-		//init shit
-		FlxG.save.bind('kannada', 'TheGamingCat86');
-    
-		Highscore.load();
-		PlayerSettings.init();
-		OptionsData.init();
-        OptionsMenu.loadSettings();
-        KeyBinds.loadKeybinds();
-
-        if (FlxG.save.data.volume != null)
-			FlxG.sound.volume = Std.parseFloat(FlxG.save.data.volume);
-
-	    FlxG.mouse.visible = false;
-		FlxG.worldBounds.set(0,0);
-		FlxG.game.focusLostFramerate = 60;
-		FlxG.autoPause = false;
-
-		#if cpp
-		DiscordClient.initialize();
-		#end
-
 		curWacky = FlxG.random.getObject(getIntroTextShit());
 
 		super.create();

@@ -1,5 +1,6 @@
 package;
 
+import haxe.rtti.Meta;
 import openfl.ui.Keyboard;
 import openfl.events.KeyboardEvent;
 import openfl.events.EventType;
@@ -21,11 +22,22 @@ class MusicBeatState extends FlxUIState
 	
 	private var controls(get, never):Controls;
 
+	public var hscript:Array<HScript> = [];
+
+	public var instance:Dynamic;
+
 	inline function get_controls():Controls
 		return PlayerSettings.player1.controls;
 
 	override function create()
 	{
+		instance = this;
+
+		hscript.push(new HScript(Paths.hscript("classes/Override/" + Type.getClassName(Type.getClass(this)) + "Script")));
+
+		for (script in hscript)
+			script.call("create");
+
 		if (transIn != null)
 			trace('reg ' + transIn.region);
 
@@ -37,17 +49,31 @@ class MusicBeatState extends FlxUIState
 
 	override function destroy()
 	{
+		for (script in hscript)
+			script.call("destroy");
+
 		FlxG.stage.removeEventListener(KeyboardEvent.KEY_DOWN, keyDown);
 		FlxG.stage.removeEventListener(KeyboardEvent.KEY_UP, keyUp);
 		super.destroy();
 	}
 
-	private function keyDown(event:KeyboardEvent) {}
+	private function keyDown(event:KeyboardEvent)
+	{
+		for (script in hscript)
+			script.call("keyDown", [event]);
+	}
 
-	private function keyUp(event:KeyboardEvent) {}
+	private function keyUp(event:KeyboardEvent)
+	{
+		for (script in hscript)
+			script.call("keyUp", [event]);
+	}
 
 	override function update(elapsed:Float)
 	{
+		for (script in hscript)
+			script.call("update", [elapsed]);
+
 		//everyStep();
 		var oldStep:Int = curStep;
 
@@ -81,13 +107,34 @@ class MusicBeatState extends FlxUIState
 		curStep = lastChange.stepTime + Math.floor((Conductor.songPosition - lastChange.songTime) / Conductor.stepCrochet);
 	}
 
+	override function onFocus()
+	{
+		for (script in hscript)
+			script.call("onFocus", []);
+
+		super.onFocus();
+	}
+
+	override function onFocusLost()
+	{
+		for (script in hscript)
+			script.call("onFocusLost", []);
+
+		super.onFocusLost();
+	}
+
 	public function stepHit():Void
 	{
-		try if (curStep % 4 == 0) beatHit() catch(_) 0;
+		for (script in hscript)
+			script.call("stepHit");
+
+		try if (curStep % 4 == 0) beatHit();
 	}
 
 	public function beatHit():Void
 	{
-		//do literally nothing dumbass
+		for (script in hscript)
+			script.call("beatHit");
 	}
+
 }

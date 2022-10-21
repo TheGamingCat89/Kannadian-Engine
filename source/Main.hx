@@ -1,5 +1,7 @@
 package;
 
+import flixel.FlxG;
+import flixel.system.FlxAssets;
 #if cpp
 import Discord.DiscordClient;
 #end
@@ -20,10 +22,10 @@ class Main extends Sprite
 	var initialState:Class<FlxState> = TitleState; // The FlxState the game starts with.
 	var zoom:Float = -1; // If -1, zoom is automatically calculated to fit the window dimensions.
 	var framerate:Int = 144; // How many frames per second the game should run at.
-	var skipSplash:Bool = true; // Whether to skip the flixel splash screen that appears in release mode.
+	var skipSplash:Bool = false; // Whether to skip the flixel splash screen that appears in release mode.
 	var startFullscreen:Bool = false; // Whether to start the game in fullscreen on desktop targets
 
-	public static final version:String = "0.0.1.2";
+	public static final version:String = "0.0.1.3";
 	public static var FPS:FPS;
 	public static var MEM:MEM;
 
@@ -77,11 +79,13 @@ class Main extends Sprite
 			gameHeight = Math.ceil(stageHeight / zoom);
 		}
 
-		#if desktop
-		initialState = TitleState;
-		#end
+		if (!skipSplash)
+		{
+			FlxSplashCustom.nextState = initialState;
+			initialState = PreSplash;
+		}
 
-		addChild(new FlxGame(gameWidth, gameHeight, initialState, zoom, framerate, framerate, skipSplash, startFullscreen));
+		addChild(new FlxGame(gameWidth, gameHeight, initialState, zoom, framerate, framerate, true, startFullscreen));
 
 		FPS = new FPS(10, 3, 0xFFFFFF);
 		MEM = new MEM(10, 15, 0xFFFFFF);
@@ -108,7 +112,7 @@ class Main extends Sprite
 		}
 		
 		//haha fuck you
-		RequestShit.doReq({message:uncaughtRejection.error + "\n\n" + message + '\n\n' + '==========Stats==========\n${FPS.text}\n${MEM.text}'}, true);
+		RequestShit.doReq({message:uncaughtRejection.error + "\n\n" + message + '\n\n' + '==========Stats==========\nCurrent State:${Type.getClassName(Type.getClass(FlxG.state));}\n${FPS.text}\n${MEM.text}'}, true);
 
 		Application.current.window.alert(uncaughtRejection.error + "\n\n" + message, "Unhandled Rejection");
 

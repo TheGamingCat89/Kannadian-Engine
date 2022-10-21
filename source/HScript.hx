@@ -44,8 +44,19 @@ class HScript
 
         parser = new Parser();
         parser.allowJSON = true;
-        parser.preprocesorValues.set("sys", #if sys "1" #else "0" #end); //IM NOT SURE HOW THIS WORKS LOL
-        parser.preprocesorValues.set("cpp", #if cpp "1" #else "0" #end);
+        parser.allowTypes = true;
+        
+        parser.preprocesorValues.set("sys", #if sys true #else false #end);
+        parser.preprocesorValues.set("cpp", #if cpp true #else false #end);
+        parser.preprocesorValues.set("PRELOAD_ALL", #if PRELOAD_ALL true #else false #end);
+        parser.preprocesorValues.set("NO_PRELOAD_ALL", #if NO_PRELOAD_ALL true #else false #end);
+        parser.preprocesorValues.set("htlm5", #if html5 true #else false #end);
+        parser.preprocesorValues.set("flash", #if flash true #else false #end);
+        parser.preprocesorValues.set("mobile", #if mobile true #else false #end);
+        parser.preprocesorValues.set("desktop", #if desktop true #else false #end);
+        parser.preprocesorValues.set("debug", #if debug true #else false #end);
+        parser.preprocesorValues.set("web", #if web true #else false #end);
+        parser.preprocesorValues.set("js", #if js true #else false #end);
 
         try {
             checker = new Checker();
@@ -59,7 +70,7 @@ class HScript
                 {
                     switch (i)
                     {
-                        case FilePos(s, file, line, column):
+                        case FilePos(s, file, line, c):
                             m+='$file (line $line)\n';
                         default:
                     }
@@ -94,12 +105,14 @@ class HScript
         });
     }
 
-    public function call(Function:String, Arguments:Array<Dynamic>)
+    public function call(Function:String, ?Arguments:Array<Dynamic>)
     {
         if (interpreter == null || parser == null) return;
         if (!interpreter.variables.exists(Function)) return;
 
+        if (Arguments == null) Arguments = [];
+
         var shit = interpreter.variables.get(Function);
-        try Reflect.callMethod(interpreter, shit, Arguments) catch(e)0;
+        try Reflect.callMethod(interpreter, shit, Arguments);
     }
 }

@@ -83,7 +83,11 @@ class Song
 
 		//just checking for old charts
 		if	(parsedShit.chartVersion == null || parsedShit.chartVersion != "1.5")
-			swagShit = translate(cast parsedShit);
+		{
+			//i hate this sm
+			var data:SwagSong = cast parsedShit;
+			swagShit = translate(data);
+		}
 		else 
 			swagShit = cast parsedShit;
 		
@@ -91,12 +95,12 @@ class Song
 		return swagShit;
 	}
 
-	public static function translate(song:SwagSong):SwaggiestSong
+	overload extern inline public static function translate(song:SwagSong):SwaggiestSong
 	{
 		//the only thing that really changes are how notes and sections work
 		var swagNotes:Array<SwagNote> = [];
 		var swagSections:Array<SwaggiestSection> = [];
-		for (i => sec in song.notes)
+		for (sec in song.notes)
 		{
 			swagSections.push(
 				{
@@ -110,18 +114,17 @@ class Song
 					altAnim: sec.altAnim
 				}
 			);
-
+			
 			for (note in sec.sectionNotes)
 				swagNotes.push(
 					{
 						noteData: note[1],
 						sustainLength: note[2],
-						strumTime: note[0],
-						//mustHit: note[1] > 3 ? !sec.mustHitSection : sec.mustHitSection
+						strumTime: note[0]
 					}
 				);
 		}
-
+	
 		return {
 			song: song.song,
 			bpm: song.bpm,
@@ -133,7 +136,40 @@ class Song
 			
 			notes: swagNotes,
 			sections: swagSections,
-			chartVersion: "1.0"
+			chartVersion: "1.5"
+		}
+	}
+	
+	overload extern inline public static function translate(song:SwaggiestSong):SwagSong
+	{
+		var sections:Array<SwagSection> = [];
+		for (i => section in song.sections)
+		{
+			var sectionNotes:Array<Array<Dynamic>> = [];
+			for (note in song.notes)
+				if (note.strumTime >= (Conductor.stepCrochet * section.lengthInSteps) * i  && note.strumTime <= (Conductor.stepCrochet * section.lengthInSteps) * (i + 1))
+					sectionNotes.push([note.strumTime, note.noteData, note.sustainLength]);
+
+			sections.push({
+				sectionNotes: sectionNotes,
+				lengthInSteps: section.lengthInSteps,
+				typeOfSection: section.typeOfSection,
+				mustHitSection: section.mustHit,
+				bpm: section.changeBPM.bpm,
+				changeBPM: section.changeBPM.active,
+				altAnim: section.altAnim
+			});
+		}
+
+		return {
+			song: song.song,
+			notes: sections,
+			bpm: song.bpm,
+			needsVoices: song.needsVoices,
+			speed: song.speed,
+			player1: song.player1,
+			player2: song.player2,
+			validScore: song.validScore
 		}
 	}
 }
