@@ -1,5 +1,6 @@
 package;
 
+import flixel.tweens.FlxTween;
 import openfl.events.KeyboardEvent;
 import openfl.ui.Keyboard;
 import Section.SwaggiestSection;
@@ -86,8 +87,12 @@ class ChartingState extends MusicBeatState
 	var leftIcon:HealthIcon;
 	var rightIcon:HealthIcon;
 
+	public static var instance:ChartingState;
+
 	override function create()
 	{
+		instance = this;
+		
 		curSection = lastSection;
 
 		gridBG = FlxGridOverlay.create(GRID_SIZE, GRID_SIZE, GRID_SIZE * 8, GRID_SIZE * 16);
@@ -179,6 +184,8 @@ class ChartingState extends MusicBeatState
 		super.create();
 	}
 
+	var hitSoundsEnabled:Bool = false;
+
 	function addSongUI():Void
 	{
 		var UI_songTitle = new FlxUIInputText(10, 10, 70, _song.song, 8);
@@ -193,7 +200,11 @@ class ChartingState extends MusicBeatState
 			trace('CHECKED!');
 		};
 
-		var check_mute_inst = new FlxUICheckBox(10, 200, null, null, "Mute Instrumental (in editor)", 100);
+		var check_hit_sounds = new FlxUICheckBox(170, 200, null, null, "HitSounds", 100);
+		check_hit_sounds.checked = false;
+		check_hit_sounds.callback = function() hitSoundsEnabled = check_hit_sounds.checked;
+
+		var check_mute_inst = new FlxUICheckBox(10, 200, null, null, "Mute Instrumental", 100);
 		check_mute_inst.checked = false;
 		check_mute_inst.callback = function()
 		{
@@ -203,6 +214,18 @@ class ChartingState extends MusicBeatState
 				vol = 0;
 
 			FlxG.sound.music.volume = vol;
+		};
+
+		var check_mute_vocal = new FlxUICheckBox(10, 220, null, null, "Mute Vocals", 100);
+		check_mute_vocal.checked = false;
+		check_mute_vocal.callback = function()
+		{
+			var vol:Float = 1;
+
+			if (check_mute_vocal.checked)
+				vol = 0;
+
+			vocals.volume = vol;
 		};
 
 		var saveButton:FlxButton = new FlxButton(110, 8, "Save", function()
@@ -256,8 +279,10 @@ class ChartingState extends MusicBeatState
 		tab_group_song.name = "Song";
 		tab_group_song.add(UI_songTitle);
 
+		tab_group_song.add(check_hit_sounds);
 		tab_group_song.add(check_voices);
 		tab_group_song.add(check_mute_inst);
+		tab_group_song.add(check_mute_vocal);
 		tab_group_song.add(saveButton);
 		tab_group_song.add(oldSaveButton);
 		tab_group_song.add(reloadSong);
@@ -609,8 +634,12 @@ class ChartingState extends MusicBeatState
 		addNote(Conductor.songPosition, keyData);
 	}
 
+	var sineNote:Float = 0;
+
 	override function update(elapsed:Float)
 	{
+		sineNote += elapsed;
+
 		curStep = recalculateSteps();
 
 		Conductor.songPosition = FlxG.sound.music.time;
@@ -620,9 +649,7 @@ class ChartingState extends MusicBeatState
 
 		if (curBeat % 4 == 0 && curStep >= 16 * (curSection + 1))
 		{
-			trace(curStep);
 			trace((_song.sections[curSection].lengthInSteps) * (curSection + 1));
-			trace('DUMBSHIT');
 
 			if (_song.notes[curSection + 1] == null)
 			{
@@ -631,6 +658,13 @@ class ChartingState extends MusicBeatState
 
 			changeSection(curSection + 1, false);
 		}
+
+		curRenderedNotes.forEach((note) -> {
+			if (note != null && curSelectedNote != null && note.strumTime == curSelectedNote.strumTime 
+				&& note.noteData == curSelectedNote.noteData && note.sustainLength == curSelectedNote.sustainLength)
+				note.alpha = Math.abs(Math.sin(sineNote));
+			else note.alpha = 1;
+		});
 
 		if (FlxG.mouse.x > gridBG.x
 			&& FlxG.mouse.x < gridBG.x + gridBG.width
@@ -643,6 +677,14 @@ class ChartingState extends MusicBeatState
 			else
 				dummyArrow.y = Math.floor(FlxG.mouse.y / GRID_SIZE) * GRID_SIZE;
 		}
+
+		curRenderedNotes.forEach(note -> {
+			if (Conductor.songPosition >= note.strumTime && FlxG.sound.music.playing && !note.wasGoodHit && hitSoundsEnabled)
+			{	
+				FlxG.sound.play(Paths.sound("hitsound"), 0.5).x += (note.noteData % 4) * 50;
+				note.wasGoodHit = true;
+			}
+		});
 
 		FlxG.watch.addQuick('daBeat', curBeat);
 		FlxG.watch.addQuick('daStep', curStep);
@@ -837,13 +879,13 @@ class ChartingState extends MusicBeatState
 	{
 		if (check_mustHitSection.checked)
 		{
-			leftIcon.animation.play(_song.player1);
-			rightIcon.animation.play(_song.player2);
+			leftIcon.changeIcon(_song.player1);
+			rightIcon.changeIcon(_song.player2);
 		}
 		else
 		{
-			leftIcon.animation.play(_song.player2);
-			rightIcon.animation.play(_song.player1);
+			leftIcon.changeIcon(_song.player2);
+			rightIcon.changeIcon(_song.player1);
 		}
 	}
 

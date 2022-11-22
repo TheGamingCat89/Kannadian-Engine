@@ -24,16 +24,12 @@ class MusicBeatState extends FlxUIState
 
 	public var hscript:Array<HScript> = [];
 
-	public var instance:Dynamic;
-
 	inline function get_controls():Controls
 		return PlayerSettings.player1.controls;
 
 	override function create()
 	{
-		instance = this;
-
-		hscript.push(new HScript(Paths.hscript("classes/Override/" + Type.getClassName(Type.getClass(this)) + "Script")));
+		hscript.push(new HScript(Paths.hscript("classes/" + Type.getClassName(Type.getClass(this)) + "Script")));
 
 		for (script in hscript)
 			script.call("create");

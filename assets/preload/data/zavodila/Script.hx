@@ -1,14 +1,14 @@
-import PlayState;
-import Std;
-import flixel.FlxSprite;
-import flixel.FlxG;
-import flixel.tweens.FlxTween;
+var PlayState = require("PlayState");
+var Std = require("Std");
+var FlxSprite = require("flixel.FlxSprite");
+var FlxG = require("flixel.FlxG");
+var FlxTween = require("flixel.tweens.FlxTween");
 
 function create()
 {
     trace("loaded script");
 }
-
+   
 function opponentNoteHit(daNote)
 {
     var dad = PlayState.instance.dad; //gr

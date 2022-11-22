@@ -175,7 +175,7 @@ class Character extends FlxSprite
 				tex = Paths.getSparrowAtlas('characters/momCar', 'shared');
 				frames = tex;
 
-				animation.addByPrefix('idle', "Mom Idle", 24, false);
+				animation.addByPrefix('idle', "Mom Idle", 24, true);
 				animation.addByPrefix('singUP', "Mom Up Pose", 24, false);
 				animation.addByPrefix('singDOWN', "MOM DOWN POSE", 24, false);
 				animation.addByPrefix('singLEFT', 'Mom Left Pose', 24, false);
@@ -289,7 +289,7 @@ class Character extends FlxSprite
 			case 'bf-car':
 				var tex = Paths.getSparrowAtlas('characters/bfCar', 'shared');
 				frames = tex;
-				animation.addByPrefix('idle', 'BF idle dance', 24, false);
+				animation.addByPrefix('idle', 'BF idle dance', 24, true);
 				animation.addByPrefix('singUP', 'BF NOTE UP0', 24, false);
 				animation.addByPrefix('singLEFT', 'BF NOTE LEFT0', 24, false);
 				animation.addByPrefix('singRIGHT', 'BF NOTE RIGHT0', 24, false);
@@ -489,7 +489,7 @@ class Character extends FlxSprite
 				animation.getByName('singLEFT').frames = oldRight;
 
 				// IF THEY HAVE MISS ANIMATIONS??
-				if (animation.getByName('singRIGHTmiss') != null)
+				if (animation.exists('singRIGHTmiss'))
 				{
 					var oldMiss = animation.getByName('singRIGHTmiss').frames;
 					animation.getByName('singRIGHTmiss').frames = animation.getByName('singLEFTmiss').frames;
@@ -517,7 +517,7 @@ class Character extends FlxSprite
 			{
 				playAnim('deathLoop');
 			}
-		}
+		}	
 
 		var dadVar:Float = 4;
 		if (curCharacter == 'dad')
@@ -525,9 +525,11 @@ class Character extends FlxSprite
 
 		if (holdTimer >= Conductor.stepCrochet * dadVar * 0.001)
 		{
-			dance();
+			dance();	
 			holdTimer = 0;
 		}
+
+		FlxG.watch.addQuick("Hold Timer", holdTimer);
 
 		switch (curCharacter)
 		{

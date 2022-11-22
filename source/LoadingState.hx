@@ -23,6 +23,8 @@ class LoadingState extends MusicBeatState
 	var logo:FlxSprite;
 	var gfDance:FlxSprite;
 	var danceLeft = false;
+
+	public static var instance:LoadingState;
 	
 	function new(target:FlxState, stopMusic:Bool)
 	{
@@ -33,6 +35,8 @@ class LoadingState extends MusicBeatState
 	
 	override function create()
 	{
+		instance = this;
+		
 		logo = new FlxSprite(-150, -100);
 		logo.frames = Paths.getSparrowAtlas('logoBumpin');
 		logo.antialiasing = OptionsMenu.options.antialiasing;
@@ -166,7 +170,7 @@ class LoadingState extends MusicBeatState
 		
 		return target;
 	}
-	
+
 	#if NO_PRELOAD_ALL
 	static function isSoundLoaded(path:String):Bool
 	{

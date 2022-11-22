@@ -41,7 +41,7 @@ class CoolUtil
 		return Math.max(0, Math.min(1, elapsed * mult));
 	}
 
-	//took this from mic'd up lmao credits to them !!
+	//took this from mic'd up credits to them !!
 	public static function dominantColor(sprite:FlxSprite):FlxColor 
 	{
 		var countByColor:Map<Int, Int> = [];

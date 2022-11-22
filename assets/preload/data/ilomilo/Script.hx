@@ -1,7 +1,7 @@
-import flixel.tweens.FlxEase;
-import flixel.tweens.FlxTween;
-import PlayState;
-import OptionsMenu;
+var FlxEase = require("flixel.tweens.FlxEase");
+var FlxTween = require("flixel.tweens.FlxTween");
+var PlayState = require("PlayState");
+var OptionsMenu = require("OptionsMenu");
 
 var originalPos = 0.0;
 

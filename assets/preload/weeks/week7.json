@@ -1,6 +1,6 @@
 {
     "week":"week7",
-    "weekName":"songs i like or something idk",
+    "weekName":"Miscellaneous",
     "menuCharacters":["dad", "bf", "gf"],
     "weekUnlocked": true,
     "songs":[
@@ -58,6 +58,11 @@
             "name":"ilomilo",
             "character":"mom",
             "author":"Billie Eilish"
+        },
+        {
+            "name":"Life Will Change",
+            "character":"dad",
+            "author":"Lyn"
         }
     ]
 }

@@ -4,12 +4,15 @@ import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.graphics.frames.FlxAtlasFrames;
 
+
 class GitarooPause extends MusicBeatState
 {
 	var replayButton:FlxSprite;
 	var cancelButton:FlxSprite;
 
 	var replaySelect:Bool = false;
+	
+	public static var instance:GitarooPause;
 
 	public function new():Void
 	{
@@ -18,6 +21,8 @@ class GitarooPause extends MusicBeatState
 
 	override function create()
 	{
+		instance = this;
+
 		if (FlxG.sound.music != null)
 			FlxG.sound.music.stop();
 

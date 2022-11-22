@@ -13,18 +13,18 @@ import flixel.FlxSprite;
 
 typedef Options =
 {
-	var ?ghostTapping:Bool;
-	var ?downScroll:Bool;
-	var ?simpleAccuracy:Bool;
-	var ?middleScroll:Bool;
-	var ?songPosition:Bool;
-	var ?resetButton:Bool;
-	var ?showRating:Bool;
-	var ?antialiasing:Bool;
-	var ?flashing:Bool;
-	var ?cameraZoom:Bool;
-	var ?botPlay:Bool;
-	var ?splashScreen:Bool;
+	var ghostTapping:Bool;
+	var downScroll:Bool;
+	var simpleAccuracy:Bool;
+	var middleScroll:Bool;
+	var songPosition:Bool;
+	var resetButton:Bool;
+	var showRating:Bool;
+	var antialiasing:Bool;
+	var flashing:Bool;
+	var cameraZoom:Bool;
+	var splashScreen:Bool;
+	var frameRate:Int;
 }
 
 class OptionsMenu extends MusicBeatState
@@ -33,6 +33,8 @@ class OptionsMenu extends MusicBeatState
 	public static var inKeyBindsMenu:Bool = false;
 	static var curCatSelected:Int = 0;
 	static var curOptSelected:Int = 0;
+
+	var selectedValue:Float = 0; // this is for number based options
 	var grpOptions:FlxTypedGroup<Alphabet>;
 
 	var bg:FlxSprite;
@@ -42,7 +44,8 @@ class OptionsMenu extends MusicBeatState
 	/**
 	 * You can add your own option here
 	 * you gotta add it in `Options` typedef, `OptionsData` class,
-	 * and in the `loadSettings` method in `OptionsMenu` class
+	 * and in the `loadSettings` method in `OptionsMenu` class,
+	 * and here, of course
 	 * 
 	 * IF your options is not a bool value, add it in line ~150
 	 */
@@ -61,14 +64,21 @@ class OptionsMenu extends MusicBeatState
 			"Antialiasing" => FlxG.save.data.antialiasing,
 			"Flashing" => FlxG.save.data.flashing,
 			"Camera Zoom" => FlxG.save.data.cameraZoom,
+			"Frame Rate" => FlxG.save.data.frameRate,
 			"Splash Screen" => FlxG.save.data.splashScreen
 		],
 	];
 	var optionsLength:Int = 0;// .length isnt a thing akjgldvfj;lk
 	var curSelectedCatText:String = "";
 
+	private var oldText:String;
+
+	public static var instance:OptionsMenu;
+
 	override function create()
 	{
+		instance = this;
+		
 		super.create();
 
 		bg = new FlxSprite(0,0).loadGraphic(Paths.image("menuBGMagenta"));
@@ -96,6 +106,9 @@ class OptionsMenu extends MusicBeatState
 	{
 		super.update(elapsed);
 
+		if (FlxG.save.data.frameRate != null)
+			FlxG.updateFramerate = FlxG.drawFramerate = FlxG.save.data.frameRate;
+
 		if (FlxG.sound.music != null)
 			Conductor.songPosition = FlxG.sound.music.time;
 
@@ -110,6 +123,27 @@ class OptionsMenu extends MusicBeatState
 		if (event.keyCode == Keyboard.DOWN)
 			changeSelection(1);
 
+		if (isInOptionCat)
+		{
+			var text = grpOptions.members[curOptSelected].text;
+			var val = cast optionsMap[curSelectedCatText][text];
+			if (val is Int || val is Float)
+			{
+				trace("it is a number");
+				if (event.keyCode == Keyboard.LEFT || event.keyCode == Keyboard.RIGHT)
+					if (val is Int)
+						if (event.keyCode == Keyboard.LEFT)
+							selectedValue -= 1;
+						else
+							selectedValue += 1;
+					else
+						if (event.keyCode == Keyboard.LEFT)
+							selectedValue -= 0.1;
+						else
+							selectedValue += 0.1;
+			}
+		}
+
 		if (event.keyCode == Keyboard.ENTER)
 		{
 			if (!isInOptionCat)
@@ -121,11 +155,11 @@ class OptionsMenu extends MusicBeatState
 				for (key => value in optionsMap[curSelectedCatText])
 				{
 					var option = new Alphabet(0,0, key, true);
-					if (Std.isOfType(value, Bool))
+					if (value is Bool)
 						if(value)option.color = FlxColor.GREEN;
 						else option.color = FlxColor.RED;
 					if(value == null)
-						option.color = FlxColor.WHITE;
+						option.color = FlxColor.GRAY;
 					option.targetY = fuck;
 					option.y = option.height + 40;
 					option.scrollFactor.set();
@@ -157,8 +191,6 @@ class OptionsMenu extends MusicBeatState
 					Reflect.setProperty(FlxG.save.data, text.charAt(0).toLowerCase() + text.substring(1,text.length).split(" ").join(""), optionsMap[curSelectedCatText][text]);
 				}
 					
-
-				//hopefully works? dont mind the mess
 				var value = optionsMap[curSelectedCatText][text];
 				if (value is Bool)
 					if(value)
@@ -209,11 +241,27 @@ class OptionsMenu extends MusicBeatState
 
 		if(isInOptionCat)
 		{
+			var option = optionsMap[curSelectedCatText][grpOptions.members[curOptSelected].text];
+			if (option is Float || option is Int)
+			{
+				grpOptions.members[curOptSelected].changeText(oldText);
+				FlxG.save.flush();
+				OptionsMenu.loadSettings();
+			}
+
 			curOptSelected += change;
 			if(curOptSelected > optionsLength - 1)
 				curOptSelected = 0;
 			if (curOptSelected < 0)
 				curOptSelected = optionsLength - 1;
+
+			//updating option
+			option = optionsMap[curSelectedCatText][grpOptions.members[curOptSelected].text];
+			if (option is Float || option is Int)
+			{
+				oldText = grpOptions.members[curOptSelected].text;
+				grpOptions.members[curOptSelected].changeText(oldText + " - " + option);
+			}
 		}	
 		else
 		{
@@ -260,8 +308,8 @@ class OptionsMenu extends MusicBeatState
 			antialiasing: FlxG.save.data.antialiasing,
 			flashing: FlxG.save.data.flashing,
 			cameraZoom: FlxG.save.data.cameraZoom,
-			botPlay: FlxG.save.data.botPlay, 
-			splashScreen: FlxG.save.data.splashScreen
+			splashScreen: FlxG.save.data.splashScreen,
+			frameRate: FlxG.save.data.frameRate
 		}
 	}
 }

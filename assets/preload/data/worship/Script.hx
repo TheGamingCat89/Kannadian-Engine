@@ -1,6 +1,25 @@
+//packaging isnt supported
+
 //THIS IS AN EXAMPLE SCRIPT
 //ALL THE EXISTING FUNCTIONS WILL BE HERE JUST TO SHOW IT OR SOMETHING
-//scroll all the way down to see all the imported classes!!
+
+//you can use require !!!!
+//hscript doesnt support import   yet
+//this is just used to get classes, you cannot read files with this
+var Json = require("haxe.Json");
+
+//finals arent supported
+//public and private modifiers arent supported
+//no static, macro, extern, nor overload
+
+//type declarations are ignored by parser anymore
+var hi = "final variable";
+var test:Bool = 1;
+
+//you cannot make classes    yet
+
+//you cannot define enums nor abstracts
+//they arent supported   yet
 
 function create()
 {
@@ -96,12 +115,3 @@ function beatHit()
 {
     //runs every beat
 }
-
-//ok so this was changed so ummmm
-//require is now a thing, it returns the class
-var Json =  require("haxe.Json");
-//if u used javascript u should know what this means
-//but its basically an import, u gotta assign it to a variable
-//this doesnt exactly work like js require, just an importing of classes
-//alternatively you can use actual import, which now works
-import haxe.Json;

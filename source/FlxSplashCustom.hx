@@ -1,15 +1,7 @@
 //todo: make this better
 package;
 
-import Discord.DiscordClient;
-import flixel.addons.text.FlxTypeText;
-import openfl.media.Sound;
-import flixel.text.FlxText;
-import flixel.system.FlxSound;
 import flixel.system.FlxAssets;
-import openfl.geom.Matrix;
-import flixel.addons.display.shapes.FlxShape;
-import flixel.FlxSprite;
 import flash.display.Graphics;
 import flash.display.Sprite;
 import flash.Lib;
@@ -22,6 +14,11 @@ import flixel.tweens.FlxEase;
 import flixel.tweens.FlxTween;
 import flixel.util.FlxColor;
 import flixel.util.FlxTimer;
+import lime.app.Application;
+#if cpp
+import Discord.DiscordClient;
+import sys.thread.Thread;
+#end
 
 class FlxSplashCustom extends FlxState
 {
@@ -46,18 +43,9 @@ class FlxSplashCustom extends FlxState
 
 	var coloredBg:Sprite;
 	var bgGfx:Graphics;
-	@:noPrivateAccess var triggered = false;
 
 	override public function create():Void
 	{
-		if (!OptionsMenu.options.splashScreen)
-		{
-			@:privateAccess
-			FlxG.game._gameJustStarted = true;
-			FlxG.switchState(new TitleState());
-			return;
-		}
-
 		cachedBgColor = FlxG.cameras.bgColor;
 		FlxG.cameras.bgColor = FlxColor.BLACK;
 
@@ -147,18 +135,23 @@ class FlxSplashCustom extends FlxState
 			text.textColor = 0xFFFFFFFF;
 			// Make the logo a tad bit longer, so our users fully appreciate our hard work :D
 			FlxTween.tween(sprite, {alpha: 0}, 3.0, {ease: FlxEase.quadOut, onComplete: onComplete});
-			FlxTween.tween(coloredBg, {alpha: 0}, 3.0, {ease: FlxEase.quadOut});
-			FlxTween.tween(text, {alpha: 0}, 1.0, {ease: FlxEase.quadOut});
+			FlxTween.tween(text, {alpha: 0}, 3.0, {ease: FlxEase.quadOut});
+			FlxTween.tween(coloredBg, {alpha: 0}, 1.5, {ease: FlxEase.quadOut});
+			
 		}
 	}
 
 	function drawGreen():Void
 	{
-		text.textColor = 0xFF000000;
-		bgGfx.clear();
-		bgGfx.beginFill(0x00b922);
-		bgGfx.drawRect(0,0,FlxG.game.width, FlxG.game.height);
-		bgGfx.endFill();
+		if (OptionsMenu.options.flashing)
+		{
+			text.textColor = 0xFF000000;
+			bgGfx.clear();
+			bgGfx.beginFill(0x00b922);
+			bgGfx.drawRect(0,0,FlxG.game.width, FlxG.game.height);
+			bgGfx.endFill();
+		}
+
 		gfx.beginFill(0x00b922);
 		gfx.moveTo(0, -37);
 		gfx.lineTo(1, -37);
@@ -174,10 +167,14 @@ class FlxSplashCustom extends FlxState
 
 	function drawYellow():Void
 	{
-		bgGfx.clear();
-		bgGfx.beginFill(0xffc132);
-		bgGfx.drawRect(0,0,FlxG.game.width, FlxG.game.height);
-		bgGfx.endFill();
+		if (OptionsMenu.options.flashing)
+		{
+			bgGfx.clear();
+			bgGfx.beginFill(0xffc132);
+			bgGfx.drawRect(0,0,FlxG.game.width, FlxG.game.height);
+			bgGfx.endFill();
+		}
+
 		gfx.beginFill(0xffc132);
 		gfx.moveTo(-50, -50);
 		gfx.lineTo(-25, -50);
@@ -190,10 +187,14 @@ class FlxSplashCustom extends FlxState
 
 	function drawRed():Void
 	{
-		bgGfx.clear();
-		bgGfx.beginFill(0xf5274e);
-		bgGfx.drawRect(0,0,FlxG.game.width, FlxG.game.height);
-		bgGfx.endFill();
+		if (OptionsMenu.options.flashing)
+		{
+			bgGfx.clear();
+			bgGfx.beginFill(0xf5274e);
+			bgGfx.drawRect(0,0,FlxG.game.width, FlxG.game.height);
+			bgGfx.endFill();
+		}
+
 		gfx.beginFill(0xf5274e);
 		gfx.moveTo(50, -50);
 		gfx.lineTo(25, -50);
@@ -206,10 +207,14 @@ class FlxSplashCustom extends FlxState
 
 	function drawBlue():Void
 	{
-		bgGfx.clear();
-		bgGfx.beginFill(0x3641ff);
-		bgGfx.drawRect(0,0,FlxG.game.width, FlxG.game.height);
-		bgGfx.endFill();
+		if (OptionsMenu.options.flashing)
+		{
+			bgGfx.clear();
+			bgGfx.beginFill(0x3641ff);
+			bgGfx.drawRect(0,0,FlxG.game.width, FlxG.game.height);
+			bgGfx.endFill();
+		}
+
 		gfx.beginFill(0x3641ff);
 		gfx.moveTo(-50, 50);
 		gfx.lineTo(-25, 50);
@@ -222,10 +227,14 @@ class FlxSplashCustom extends FlxState
 
 	function drawLightBlue():Void
 	{
-		bgGfx.clear();
-		bgGfx.beginFill(0x04cdfb);
-		bgGfx.drawRect(0,0,FlxG.game.width, FlxG.game.height);
-		bgGfx.endFill();
+		if (OptionsMenu.options.flashing)
+		{
+			bgGfx.clear();
+			bgGfx.beginFill(0x04cdfb);
+			bgGfx.drawRect(0,0,FlxG.game.width, FlxG.game.height);
+			bgGfx.endFill();
+		}
+
 		gfx.beginFill(0x04cdfb);
 		gfx.moveTo(50, 50);
 		gfx.lineTo(25, 50);
@@ -248,7 +257,57 @@ class FlxSplashCustom extends FlxState
 		FlxG.stage.removeChild(text);
 		FlxG.stage.removeChild(coloredBg);
 		FlxG.switchState(Type.createInstance(nextState, []));
+		FlxG.bitmap.clearCache();
+		FlxG.sound.destroy(true);
 		@:privateAccess
 		FlxG.game._gameJustStarted = true;
 	}
+}
+
+class PreSplash extends FlxState
+{
+    override public function create()
+    {
+		FlxG.save.bind('kannada', 'TheGamingCat86');
+    
+		Highscore.load();
+		PlayerSettings.init();
+        
+		OptionsData.init();
+		OptionsMenu.loadSettings();
+        KeyBinds.loadKeybinds();
+        
+        if (FlxG.save.data.volume != null)
+			FlxG.sound.volume = Std.parseFloat(FlxG.save.data.volume);
+    
+	    FlxG.mouse.visible = false;
+		FlxG.worldBounds.set(0,0);
+		FlxG.game.focusLostFramerate = 60;
+		FlxG.autoPause = false;
+
+		//i love doing stupid shit
+		#if cpp
+		@:privateAccess
+        Thread.create(() -> {
+			if (OptionsMenu.options.splashScreen && !Main.skipSplash)
+				FlxG.sound.cache("flixel/sounds/flixel");
+
+			DiscordClient.initialize();	
+			Application.current.onExit.add(exitCode -> {
+				DiscordClient.shutdown();
+			});
+
+			if (!OptionsMenu.options.splashScreen && Main.skipSplash)
+			{
+				FlxG.game._gameJustStarted = true;
+				FlxG.switchState(Type.createInstance(FlxSplashCustom.nextState, []));
+				return;
+			}
+            FlxG.switchState(new FlxSplashCustom());  
+        });  
+		#else 
+		FlxG.game._gameJustStarted = true;
+		FlxG.switchState(Type.createInstance(FlxSplashCustom.nextState, []))
+		#end
+    }
 }

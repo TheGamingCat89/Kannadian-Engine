@@ -1,6 +1,5 @@
 package;
 
-import Song.SwagNote;
 import Song.SwaggiestSong;
 import flixel.util.FlxStringUtil;
 import openfl.ui.Keyboard;
@@ -165,8 +164,12 @@ class PlayState extends MusicBeatState
 	#end
 	var storyDifficultyText:String = "";
 
+	public static var instance:PlayState;
+
 	override public function create()
 	{
+		instance = this;
+
 		hscript.push(new HScript(Paths.hscript('data/${SONG.song.toLowerCase()}/Script')));
 
 		if (FlxG.sound.music != null)
@@ -187,6 +190,8 @@ class PlayState extends MusicBeatState
 
 		persistentUpdate = true;
 		persistentDraw = true;	
+
+		super.create();
 
 		if (SONG == null)
 			SONG = Song.loadFromJson('tutorial');
@@ -327,7 +332,7 @@ class PlayState extends MusicBeatState
 		                  var street:FlxSprite = new FlxSprite(-40, streetBehind.y).loadGraphic(Paths.image('philly/street'));
 	                          add(street);
 		          }
-		          case 'milf' | 'satin-panties' | 'high':
+		          case 'milf' | 'satin panties' | 'high':
 		          {
 		                  curStage = 'limo';
 		                  defaultCamZoom = 0.90;
@@ -779,8 +784,7 @@ class PlayState extends MusicBeatState
 		healthBarBG.scrollFactor.set();
 		add(healthBarBG);
 
-		healthBar = new FlxBar(healthBarBG.x + 4, healthBarBG.y + 4, RIGHT_TO_LEFT, Std.int(healthBarBG.width - 8), Std.int(healthBarBG.height - 8), this,
-			'health', 0, 2);
+		healthBar = new FlxBar(healthBarBG.x + 4, healthBarBG.y + 4, RIGHT_TO_LEFT, Std.int(healthBarBG.width - 8), Std.int(healthBarBG.height - 8), this, 'health', 0, 2);
 		healthBar.scrollFactor.set();
 		healthBar.createFilledBar(dad.iconColor, boyfriend.iconColor);
 		// healthBar
@@ -896,14 +900,6 @@ class PlayState extends MusicBeatState
 		if (OptionsMenu.options.middleScroll)
 			opponentStrums.forEach(spr->spr.visible=false);
 
-		/*window = new FlxWindow(0,0, 1080, 720, "ur mom", 144, true, false);
-		//FlxG.stage.addChild(window);
-		//var a  = new FlxSprite(0,0).loadGraphic(Paths.image("preloaderArt"));
-		window.addChild(new Bitmap(Assets.getBitmapData(Paths.image("preloaderArt"))));
-		//a.cameras = [window.camera];*/
-
-		super.create();
-
 		for (script in hscript)
 			script.call("createPost", []);
 	}
@@ -1000,10 +996,10 @@ class PlayState extends MusicBeatState
 		for (script in hscript)
 			script.call("startCountdown", []);
 
-		inCutscene = false;
-
 		generateStaticArrows(0);
 		generateStaticArrows(1);
+
+		inCutscene = false;
 
 		talking = false;
 		startedCountdown = true;
@@ -1152,7 +1148,7 @@ class PlayState extends MusicBeatState
 		{
 			for (songNotes in SONG.notes)
 			{	
-				if (songNotes.strumTime < (Conductor.stepCrochet * section.lengthInSteps) * curSec || songNotes.strumTime > (Conductor.stepCrochet * section.lengthInSteps) * (curSec + 1)) continue;
+				if (songNotes.strumTime <= (Conductor.stepCrochet * section.lengthInSteps) * curSec || songNotes.strumTime >= (Conductor.stepCrochet * section.lengthInSteps) * (curSec + 1)) continue;
 
 				var daStrumTime:Float = songNotes.strumTime;
 				var daNoteData:Int = Std.int(songNotes.noteData % 4);
@@ -1513,8 +1509,8 @@ class PlayState extends MusicBeatState
 
 		if (OptionsMenu.options.middleScroll)
 		{
-			iconP1.y = healthBar.y + (healthBar.width * (FlxMath.remapToRange(healthBar.percent, 0, 100, 100, 0) * 0.01) - 26);
-			iconP2.y = healthBar.y + (healthBar.width * (FlxMath.remapToRange(healthBar.percent, 0, 100, 100, 0) * 0.01)) - (iconP2.height - 26);
+			iconP1.y = ( healthBar.y + ( healthBar.width * (FlxMath.remapToRange(healthBar.percent, 0, 100, 100, 0) * 0.01) - 26) ) * -2;
+			iconP2.y = ( healthBar.y + ( healthBar.width * (FlxMath.remapToRange(healthBar.percent, 0, 100, 100, 0) * 0.01) ) - (iconP2.height - 26) ) * -2;
 		} else {
 			iconP1.x = healthBar.x + (healthBar.width * (FlxMath.remapToRange(healthBar.percent, 0, 100, 100, 0) * 0.01) - 26);
 			iconP2.x = healthBar.x + (healthBar.width * (FlxMath.remapToRange(healthBar.percent, 0, 100, 100, 0) * 0.01)) - (iconP2.width - 26);
@@ -2585,7 +2581,7 @@ class PlayState extends MusicBeatState
 		if (generatedMusic)
 			notes.sort(FlxSort.byY, (OptionsMenu.options.downScroll ? FlxSort.ASCENDING : FlxSort.DESCENDING));
 
-		if (SONG.notes[Math.floor(curStep / 16)] != null)
+		if (SONG.sections[Math.floor(curStep / 16)] != null)
 		{
 			if (SONG.sections[Math.floor(curStep / 16)].changeBPM.active)
 			{

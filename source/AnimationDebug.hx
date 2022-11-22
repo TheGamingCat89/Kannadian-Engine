@@ -40,6 +40,8 @@ class AnimationDebug extends MusicBeatState
 	var charData:CharacterData = null;
 	var menu:FlxUITabMenu;
 
+	public static var instance:AnimationDebug;
+
 	public function new(daAnim:String = 'bf')
 	{
 		super();
@@ -48,6 +50,8 @@ class AnimationDebug extends MusicBeatState
 
 	override function create()
 	{
+		instance = this;
+		
 		FlxG.mouse.visible = true;
 
 		#if sys if (FileSystem.exists(Paths.json("characters/" + daAnim))) #end

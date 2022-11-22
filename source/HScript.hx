@@ -1,7 +1,5 @@
 package;
 
-//i forgot i was doing this LOL
-//ill work on it.. later
 import haxe.CallStack;
 import flixel.util.FlxColor;
 import hscript.*;
@@ -13,6 +11,7 @@ import sys.FileSystem;
 
 using StringTools;
 
+//yea im gonna change a lot of stuff maybe in the future
 class HScript 
 {
     public var interpreter:Interp;
@@ -20,9 +19,7 @@ class HScript
     public var parser:Parser;
 
     static private var hadError:Bool = false;
-    private var checker:Checker;
 
-    //hope this works
     public function new(path:String)
     {
         var file:String = 'trace("No script found");';
@@ -41,7 +38,7 @@ class HScript
         // var PlayState = require("PlayState");
         // var Json = require("haxe.Json"); 
         interpreter.variables.set("require", Type.resolveClass);
-
+    
         parser = new Parser();
         parser.allowJSON = true;
         parser.allowTypes = true;
@@ -50,7 +47,7 @@ class HScript
         parser.preprocesorValues.set("cpp", #if cpp true #else false #end);
         parser.preprocesorValues.set("PRELOAD_ALL", #if PRELOAD_ALL true #else false #end);
         parser.preprocesorValues.set("NO_PRELOAD_ALL", #if NO_PRELOAD_ALL true #else false #end);
-        parser.preprocesorValues.set("htlm5", #if html5 true #else false #end);
+        parser.preprocesorValues.set("html5", #if html5 true #else false #end);
         parser.preprocesorValues.set("flash", #if flash true #else false #end);
         parser.preprocesorValues.set("mobile", #if mobile true #else false #end);
         parser.preprocesorValues.set("desktop", #if desktop true #else false #end);
@@ -59,8 +56,6 @@ class HScript
         parser.preprocesorValues.set("js", #if js true #else false #end);
 
         try {
-            checker = new Checker();
-            checker.check(parser.parseString(file), null, true);
             interpreter.execute(parser.parseString(file));
         } catch(e) {
             if (e.toString() == "Null Object Reference")
@@ -70,7 +65,7 @@ class HScript
                 {
                     switch (i)
                     {
-                        case FilePos(s, file, line, c):
+                        case FilePos(s, file, line):
                             m+='$file (line $line)\n';
                         default:
                     }
@@ -83,12 +78,12 @@ class HScript
             hadError = true;
         }
 
-        interpreter.variables.set("FlxColorFromString", function(str) {
+        interpreter.variables.set("FlxColorFromString", (str) -> {
             var result:Null<FlxColor> = null;
             str = StringTools.trim(str);
             @:privateAccess
             if (FlxColor.COLOR_REGEX.match(str)) {
-                var hexColor:String = "0x" + FlxColor.COLOR_REGEX.matched(2);
+                var hexColor:String = "0x" + FlxColor.COLOR_REGEX.matched(2); 
                 result = new FlxColor(Std.parseInt(hexColor));
                 if (hexColor.length == 8)
                     result.alphaFloat = 1;

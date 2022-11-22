@@ -31,8 +31,11 @@ class OptionsData
             FlxG.save.data.simpleAccuracy = true;
         if (FlxG.save.data.showRating == null)
             FlxG.save.data.showRating = true;
+        if (FlxG.save.data.frameRate == null)
+            FlxG.save.data.frameRate = 60;
         if (FlxG.save.data.splashScreen == null)
-            FlxG.save.data.splashScreen = true;
+            FlxG.save.data.splashScreen = false;
+        
 
         if (FlxG.save.data.upBind == null)
             FlxG.save.data.upBind =  W.toString();
@@ -63,6 +66,8 @@ class OptionsData
         FlxG.save.data.downBind = null;
         FlxG.save.data.leftBind = null;
         FlxG.save.data.rightBind = null;
+        FlxG.save.data.frameRate = null;
+        FlxG.save.data.splashScreen = null;
 
         FlxG.save.flush();
     }

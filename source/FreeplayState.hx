@@ -75,6 +75,8 @@ class FreeplayState extends MusicBeatState
 	var colorTween:FlxTween = null;
 	var iconColor:String;
 
+	public static var instance:FreeplayState;
+
 	public static function loadDiff(diff:Int, format:String, name:String, array:Array<SwaggiestSong>)
 	{
 		try {
@@ -86,6 +88,8 @@ class FreeplayState extends MusicBeatState
 
 	override function create()
 	{
+		instance = this;
+
 		//var initSonglist = CoolUtil.coolTextFile(Paths.txt('data/freeplaySonglist'));
 
 		songData = [];
@@ -229,7 +233,7 @@ class FreeplayState extends MusicBeatState
 		textBG = new FlxSprite(0, FlxG.height - 26).makeGraphic(FlxG.width, 26, 0xFF000000);
 		textBG.alpha = 0.6;
 		add(textBG);
-		text = new FlxText(textBG.x, textBG.y + 4, FlxG.width, "Press SPACE to listen to this song", size);
+		text = new FlxText(textBG.x, textBG.y + 4, FlxG.width, "Press SPACE to listen to this song | CONTROL to open gameplay changers", size);
 		text.setFormat(Paths.font("vcr.ttf"), size, FlxColor.WHITE, CENTER);
 		text.scrollFactor.set();
 		add(text);
@@ -364,7 +368,7 @@ class FreeplayState extends MusicBeatState
 				} else {
 					text.text = 'There was an error trying to play ' + weeks[curWeekSelected].songs[curSongSelected].songName;
 					new FlxTimer().start(2.5, tmr -> {
-						text.text = "Press SPACE to listen to this song";
+						text.text = "Press SPACE to listen to this song | CONTROL to open gameplay changers";
 					});
 					return;
 				}
@@ -381,7 +385,7 @@ class FreeplayState extends MusicBeatState
 				#end
 				new FlxTimer().start(1, tmr ->
 				{
-					text.text = "Press SPACE to listen to this song";
+					text.text = "Press SPACE to listen to this song | CONTROL to open gameplay changers";
 				});
 			} else if (isWeek)
 				trace("this is a week, it doesnt have a song to load")
@@ -390,7 +394,7 @@ class FreeplayState extends MusicBeatState
 				text.text = 'This song is already playing!';
 				new FlxTimer().start(0.6, tmr ->
 				{
-					text.text = "Press SPACE to listen to this song";
+					text.text = "Press SPACE to listen to this song | CONTROL to open gameplay changers";
 				});
 			}
 			#end

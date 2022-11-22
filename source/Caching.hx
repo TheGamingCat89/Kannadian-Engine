@@ -16,9 +16,13 @@ using StringTools;
 class Caching extends MusicBeatState
 {
 	var logo:FlxSprite;
+
+	public static var instance:Caching;
 	
 	override function create() 
 	{
+		instance =  this;
+
 		logo = new FlxSprite(FlxG.width / 2, FlxG.height / 2).loadGraphic(Paths.image('preloaderArt'));
 		logo.setGraphicSize(Std.int(logo.width * 0.3));		
 		logo.antialiasing = OptionsMenu.options.antialiasing;

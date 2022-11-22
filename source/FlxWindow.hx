@@ -1,4 +1,5 @@
 //credits to EIT#1707 woo
+//not sure if ill use this at all
 package;
 
 import flixel.FlxCamera;

@@ -109,7 +109,7 @@ class PauseSubState extends MusicBeatSubstate
 					close();
 					var diff = "";
 					switch (PlayState.storyDifficulty) {case 0: diff = "Easy"; case 1: diff = "Normal"; case 2: diff = "Hard";}
-					var author = cast (FlxG.state, PlayState).instance.weekData.songs[(PlayState.isStoryMode ? cast (FlxG.state, PlayState).instance.curStorySong : FreeplayState.curSongSelected)].author;
+					var author = PlayState.instance.weekData.songs[(PlayState.isStoryMode ? @:privateAccess PlayState.instance.curStorySong : FreeplayState.curSongSelected)].author;
 					Lib.application.window.title = Application.current.meta.get("name") + " - " + PlayState.SONG.song + " (" + diff +") | By: " + author;
 				case "Restart Song":
 					FlxG.resetState();

@@ -37,8 +37,12 @@ class MainMenuState extends MusicBeatState
 	var magenta:FlxSprite;
 	var camFollow:FlxObject;
 
+	public static var instance:MainMenuState;
+
 	override function create()
 	{
+		instance = this;
+		
 		#if cpp
 		// Updating Discord Rich Presence
 		DiscordClient.changePresence("In the Menus", null);
@@ -47,8 +51,11 @@ class MainMenuState extends MusicBeatState
 		transIn = FlxTransitionableState.defaultTransIn;
 		transOut = FlxTransitionableState.defaultTransOut;
 
-		if (FlxG.sound.music == null)
+		if (FlxG.sound.music != null && FlxG.sound.music.playing)
+		{
 			FlxG.sound.playMusic(Paths.music('freakyMenu'));
+			Conductor.changeBPM(102);
+		}
 
 		persistentUpdate = persistentDraw = true;
 

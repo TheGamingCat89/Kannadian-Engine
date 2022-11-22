@@ -1,5 +1,5 @@
-import PlayState;
-import Math;
+var PlayState = require("PlayState");
+var Math = require("Math");
 
 var sine = 0.0;
 
