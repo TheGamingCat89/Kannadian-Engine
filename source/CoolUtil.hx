@@ -37,12 +37,12 @@ class CoolUtil
 		return dumbArray;
 	}
 
-	public static function lerpShit(elapsed:Float, mult:Float):Float {
+	public static inline function lerpShit(elapsed:Float, mult:Float):Float {
 		return Math.max(0, Math.min(1, elapsed * mult));
 	}
 
 	//took this from mic'd up credits to them !!
-	public static function dominantColor(sprite:FlxSprite):FlxColor 
+	public static function dominantColor(sprite:FlxSprite):FlxColor
 	{
 		var countByColor:Map<Int, Int> = [];
 		for (col in 0...sprite.frameWidth) {
@@ -57,7 +57,7 @@ class CoolUtil
 				}
 			}
 		}
-		
+
 		var maxCount = 0;
 		var maxKey:Int = 0; // after the loop this will store the max color
 		countByColor[FlxColor.BLACK] = 0;

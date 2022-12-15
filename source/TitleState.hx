@@ -39,7 +39,7 @@ class TitleState extends MusicBeatState
 	override public function create():Void
 	{
 		instance = this;
-		
+
 		curWacky = FlxG.random.getObject(getIntroTextShit());
 
 		super.create();
@@ -102,6 +102,8 @@ class TitleState extends MusicBeatState
 		gfDance.antialiasing = OptionsMenu.options.antialiasing;
 		add(gfDance);
 		add(logoBl);
+
+		gfDance.animation.play("a");
 
 		titleText = new FlxSprite(100, FlxG.height * 0.8);
 		titleText.frames = Paths.getSparrowAtlas('titleEnter');
@@ -173,12 +175,12 @@ class TitleState extends MusicBeatState
 		if (event.keyCode == Keyboard.F)
 			FlxG.fullscreen = !FlxG.fullscreen;
 
-		if (event.keyCode == 13)
+		if (event.keyCode == Keyboard.ENTER)
 			pressedEnter = true;
 
 		super.keyDown(event);
 	}
-	
+
 	override function keyUp(event:KeyboardEvent) {super.keyUp(event);if(event.keyCode==Keyboard.ENTER)pressedEnter=false;}
 
 	override function update(elapsed:Float)

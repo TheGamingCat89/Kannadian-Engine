@@ -56,7 +56,7 @@ class FreeplayState extends MusicBeatState
 
 	var bg:FlxSprite;
 	var scoreBG:FlxSprite;
-	
+
 	#if PRELOAD_ALL
 	var text:FlxText;
 	var textBG:FlxSprite;
@@ -77,6 +77,8 @@ class FreeplayState extends MusicBeatState
 
 	public static var instance:FreeplayState;
 
+	private var etxt:FlxText;
+
 	public static function loadDiff(diff:Int, format:String, name:String, array:Array<SwaggiestSong>)
 	{
 		try {
@@ -95,26 +97,26 @@ class FreeplayState extends MusicBeatState
 		songData = [];
 
 		weeks = [];
-		
+
 		//fuck html
 		#if html5 var weeksFiles = ["week0.json","week1.json","week2.json","week3.json","week4.json","week5.json","week6.json","week7.json"]; #end
-		
+
 		//loading data
 		for (file in #if sys FileSystem.readDirectory(FileSystem.absolutePath('assets/weeks'))#else weeksFiles #end) // each week
 		{
 			if (!file.endsWith(".json")) continue; //skip if its not a json
 
 			var weekData:WeekData = Json.parse(Assets.getText(Paths.json('weeks/' + file.split(".")[0])));
-	
+
 			var weekSongsShit:Array<FreeplaySongMetadata> = [];
-	
+
 			for (song in weekData.songs) // each song per week
 			{
 				var meta = new FreeplaySongMetadata(song.name, song.character, song.author);
-				
+
 				var diffs = [];
 				var diffsThatExist = [];
-				
+
 				#if sys
 				if (FileSystem.exists('assets/data/${meta.songName}/${meta.songName}-easy.json'))
 					diffsThatExist.push("Easy");
@@ -136,18 +138,18 @@ class FreeplayState extends MusicBeatState
 					FreeplayState.loadDiff(1,meta.songName,meta.songName,diffs);
 				if (diffsThatExist.contains("Hard"))
 					FreeplayState.loadDiff(2,meta.songName,meta.songName,diffs);
-			
+
 				meta.diffs = diffsThatExist;
-	
+
 				if (diffsThatExist.length != 3)
 					trace("ONLY FOUND " + diffsThatExist + "DIFFICULTIES??");
-			
+
 				FreeplayState.songData.set(meta.songName,diffs);
 				trace('loaded diffs for ' + meta.songName);
-	
+
 				weekSongsShit.push(meta);
 			}
-			
+
 			weeks.push(new WeekMetadata(weekData.weekName, Std.parseInt(weekData.week.substring(weekData.week.length-1)), weekData.songs[0].character, weekSongsShit));
 		}
 
@@ -170,7 +172,7 @@ class FreeplayState extends MusicBeatState
 		add(bg);
 
         grpSongs = new FlxTypedGroup<Alphabet>();
-        add(grpSongs);    
+        add(grpSongs);
 
 		grpIcons = new FlxTypedGroup<HealthIcon>();
 		add(grpIcons);
@@ -183,12 +185,12 @@ class FreeplayState extends MusicBeatState
 				weekText.isMenuItem = true;
 				weekText.targetY = i;
 				grpSongs.add(weekText);
-			
+
 				var icon:HealthIcon = new HealthIcon(week.weekCharacter.toLowerCase());
 				icon.sprTracker = weekText;
 				grpIcons.add(icon);
 			}
-		}	
+		}
 		else
 		{
 			for (i => song in weeks[curWeekSelected].songs)
@@ -197,7 +199,7 @@ class FreeplayState extends MusicBeatState
 				weekText.isMenuItem = true;
 				weekText.targetY = i;
 				grpSongs.add(weekText);
-				
+
 				var icon:HealthIcon = new HealthIcon(song.songCharacter.toLowerCase());
 				icon.sprTracker = weekText;
 				grpIcons.add(icon);
@@ -227,7 +229,7 @@ class FreeplayState extends MusicBeatState
 		infoText.font = scoreText.font;
 		add(infoText);
 
-		add(scoreText);	
+		add(scoreText);
 
 		#if PRELOAD_ALL
 		textBG = new FlxSprite(0, FlxG.height - 26).makeGraphic(FlxG.width, 26, 0xFF000000);
@@ -252,7 +254,7 @@ class FreeplayState extends MusicBeatState
 	}
 
 	public function addWeek(weekName:String, songs:Array<FreeplaySongMetadata>, weekNum:Int)
-		weeks.push(new FreeplayState.WeekMetadata(weekName, weekNum, songs[0].songCharacter, songs));		
+		weeks.push(new FreeplayState.WeekMetadata(weekName, weekNum, songs[0].songCharacter, songs));
 
 	static var instPlaying:String = '';
 
@@ -282,7 +284,7 @@ class FreeplayState extends MusicBeatState
 				colorTween.cancel();
 
 			if(!isWeek)
-			{			
+			{
 				isWeek = true;
 				grpSongs.clear();
 				grpIcons.clear();
@@ -292,7 +294,7 @@ class FreeplayState extends MusicBeatState
 					weekText.isMenuItem = true;
 					weekText.targetY = i;
 					grpSongs.add(weekText);
-				
+
 					var icon:HealthIcon = new HealthIcon(week.weekCharacter);
 					icon.sprTracker = weekText;
 					grpIcons.add(icon);
@@ -326,18 +328,30 @@ class FreeplayState extends MusicBeatState
 					grpIcons.add(icon);
 				}
 				curSongSelected = 0;
-				changeSelection();		
+				changeSelection();
 			}
 			else
-			{	
+			{
 				var poop:String = Highscore.formatSong(weeks[curWeekSelected].songs[curSongSelected].songName.toLowerCase(), curDifficulty);
-			
-				PlayState.SONG = Song.loadFromJson(poop, weeks[curWeekSelected].songs[curSongSelected].songName.toLowerCase());
-				PlayState.isStoryMode = false;
-				PlayState.storyDifficulty = curDifficulty;
-				PlayState.storyWeek = weeks[curWeekSelected].week;
-				trace('CUR WEEK ' + PlayState.storyWeek);
-				LoadingState.loadAndSwitchState(new PlayState());
+
+				try
+				{
+					PlayState.SONG = Song.loadFromJson(poop, weeks[curWeekSelected].songs[curSongSelected].songName.toLowerCase());
+					PlayState.isStoryMode = false;
+					PlayState.storyDifficulty = curDifficulty;
+					PlayState.storyWeek = weeks[curWeekSelected].week;
+					trace('CUR WEEK ' + PlayState.storyWeek);
+					LoadingState.loadAndSwitchState(new PlayState());
+				} catch (e) {
+					FlxG.camera.shake(0.004, 0.01);
+					FlxG.sound.play(Paths.sound('cancelMenu'));
+					if (etxt == null){
+						etxt = new FlxText(15,15, 0, "ERROR: Song JSON not found!").setFormat(null, 28, 0xFF0000, LEFT, OUTLINE, 0x000000);
+						add(etxt);
+					}
+					etxt.alpha = 1;
+					FlxTween.tween( etxt, {alpha: 0}, 0.65, {startDelay: 3});
+				}
 			}
 		}
 
@@ -356,14 +370,19 @@ class FreeplayState extends MusicBeatState
 				var song = diffs[curDifficulty];
 				if (diffs.length != 3)
 					song = diffs[0]; //whatever
-	
+
 				if (song != null)
 				{
 					Conductor.changeBPM(song.bpm);
 					FlxG.sound.playMusic(Paths.inst(song.song), 0.7);
-					FlxG.sound.music.onComplete = function()
+					FlxG.sound.music.onComplete = () ->
 					{
-						Conductor.changeBPM(song.bpm);
+						//Conductor.changeBPM(song.bpm);
+						changeSelection(1);
+
+						new FlxTimer().start(0.01, (tmr) -> {
+							playSong();
+						});
 					}
 				} else {
 					text.text = 'There was an error trying to play ' + weeks[curWeekSelected].songs[curSongSelected].songName;
@@ -372,13 +391,13 @@ class FreeplayState extends MusicBeatState
 					});
 					return;
 				}
-	
+
 				PlayState.SONG = song;
 
 				FlxG.sound.music.volume = 0;
-	
+
 				instPlaying = weeks[curWeekSelected].songs[curSongSelected].songName.toLowerCase();
-	
+
 				text.text = 'Playing ' + weeks[curWeekSelected].songs[curSongSelected].songName + '!';
 				#if windows
 				DiscordClient.changePresence("In the Freeplay Menu", "Listening to " + weeks[curWeekSelected].songs[curSongSelected].songName + " - By: " + weeks[curWeekSelected].songs[curSongSelected].songAuthor);
@@ -399,7 +418,7 @@ class FreeplayState extends MusicBeatState
 			}
 			#end
 	}
-	
+
 	override function update(elapsed:Float)
 	{
 		super.update(elapsed);
@@ -477,14 +496,14 @@ class FreeplayState extends MusicBeatState
 		var songDiffs = weeks[curWeekSelected].songs[curSongSelected].diffs;
 
 		//if (/*!["Easy","Normal","Hard"].contains(songDiffs[curDifficulty + change]) || */songDiffs[curDifficulty + change].toLowerCase() == "undefined")return;
-		
+
 		curDifficulty += change;
 
 		if (curDifficulty < 0)
 			curDifficulty = songDiffs.length - 1;
 		if (curDifficulty > songDiffs.length - 1)
 			curDifficulty = 0;
-		
+
 		#if !switch
 		intendedScore = Highscore.getScore(weeks[curWeekSelected].songs[curSongSelected].songName, curDifficulty);
 		#end
@@ -506,8 +525,8 @@ class FreeplayState extends MusicBeatState
 				curWeekSelected = weeks.length - 1;
 			if (curWeekSelected >= weeks.length)
 				curWeekSelected = 0;
-		}			
-		else 
+		}
+		else
 		{
 			if (curSongSelected < 0)
 				curSongSelected = weeks[curWeekSelected].songs.length - 1;
@@ -515,7 +534,7 @@ class FreeplayState extends MusicBeatState
 				curSongSelected = 0;
 
 			changeDiff();
-		}		
+		}
 
 		if (weeks[curWeekSelected].songs[curSongSelected].diffs.length != 3)
 		{
@@ -532,7 +551,7 @@ class FreeplayState extends MusicBeatState
 
 		authorTxt.text = "By: " + weeks[curWeekSelected].songs[curSongSelected].songAuthor;
 		infoText.text = "Song Length: " + FlxStringUtil.formatTime(openfl.Assets.getMusic(Paths.inst(weeks[curWeekSelected].songs[curSongSelected].songName.toLowerCase())).length / 1000);
-		
+
 		scoreBG.visible = !isWeek;
 		scoreText.visible = !isWeek;
 		diffText.visible = !isWeek;
@@ -557,20 +576,19 @@ class FreeplayState extends MusicBeatState
 		{
 			item.targetY = bullShit - (isWeek ? curWeekSelected : curSongSelected);
 			bullShit++;
-    
+
 			item.alpha = 0.6;
-    
+
 			if (item.targetY == 0)
 				item.alpha = 1;
 		}
-		
+
 		if(OptionsMenu.options.flashing){
-			//uh??
 			var data:CharacterData;
 			if (Assets.exists(Paths.json('characters/' + weeks[curWeekSelected].weekCharacter)))
 				data = Json.parse(Assets.getText(Paths.json('characters/' + weeks[curWeekSelected].weekCharacter)));
-			else 
-				data = Json.parse(Assets.getText(Paths.json('characters/dad'))); //awawawa
+			else
+				data = Json.parse(Assets.getText(Paths.json('characters/dad')));
 
 			iconColor = data.icon.color;
 
@@ -582,10 +600,10 @@ class FreeplayState extends MusicBeatState
 				colorTween = FlxTween.color(bg, 1, bg.color, FlxColor.fromString(iconColor), {ease: FlxEase.sineInOut,
 					onComplete: twn -> {
 						colorTween = null;
-					} 
+					}
 				});
 			}
-			
+
 		}
 	}
 

@@ -1,5 +1,7 @@
 package;
 
+import haxe.rtti.XmlParser;
+import haxe.Json;
 import haxe.CallStack;
 import flixel.util.FlxColor;
 import hscript.*;
@@ -12,7 +14,7 @@ import sys.FileSystem;
 using StringTools;
 
 //yea im gonna change a lot of stuff maybe in the future
-class HScript 
+class HScript
 {
     public var interpreter:Interp;
     public var variables:Map<String, Dynamic>;
@@ -23,7 +25,11 @@ class HScript
     public function new(path:String)
     {
         var file:String = 'trace("No script found");';
-#if sys if (FileSystem.exists(path)) #end
+        #if sys
+        if (FileSystem.exists(path))
+        #else
+        if (Assets.exists(path))
+        #end
             file = Assets.getText(path);
 
         if (hadError)
@@ -33,16 +39,30 @@ class HScript
         }
 
         interpreter = new Interp();
-    
+
         //to use require just do it like this !!!
         // var PlayState = require("PlayState");
-        // var Json = require("haxe.Json"); 
-        interpreter.variables.set("require", Type.resolveClass);
-    
+        // var Json = require("haxe.Json");
+        interpreter.variables.set("require", (str) -> {
+            if (FileSystem.exists(FileSystem.absolutePath(str)))
+            {
+                var fileContent:Any = null;
+                if (str.endsWith(".json"))
+                    fileContent = Json.parse(Assets.getText(FileSystem.absolutePath(str)))
+                else if (str.endsWith(".xml"))
+                    fileContent = Xml.parse(Assets.getText(FileSystem.absolutePath(str)));
+                else
+                    fileContent = Assets.getText(FileSystem.absolutePath(str));
+                return fileContent;
+            }
+            else
+                return Type.resolveClass(str);
+        });
+
         parser = new Parser();
         parser.allowJSON = true;
         parser.allowTypes = true;
-        
+
         parser.preprocesorValues.set("sys", #if sys true #else false #end);
         parser.preprocesorValues.set("cpp", #if cpp true #else false #end);
         parser.preprocesorValues.set("PRELOAD_ALL", #if PRELOAD_ALL true #else false #end);
@@ -57,6 +77,7 @@ class HScript
 
         try {
             interpreter.execute(parser.parseString(file));
+            //parser.parseModule()
         } catch(e) {
             if (e.toString() == "Null Object Reference")
             {
@@ -83,7 +104,7 @@ class HScript
             str = StringTools.trim(str);
             @:privateAccess
             if (FlxColor.COLOR_REGEX.match(str)) {
-                var hexColor:String = "0x" + FlxColor.COLOR_REGEX.matched(2); 
+                var hexColor:String = "0x" + FlxColor.COLOR_REGEX.matched(2);
                 result = new FlxColor(Std.parseInt(hexColor));
                 if (hexColor.length == 8)
                     result.alphaFloat = 1;
